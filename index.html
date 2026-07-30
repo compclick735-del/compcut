@@ -83,8 +83,14 @@
                 </div>
             </div>
 
-            <!-- Auth Section -->
+            <!-- Auth & Action Section -->
             <div class="flex items-center gap-3">
+                <!-- Upgrade Pro Button -->
+                <button id="upgrade-btn" onclick="handleUpgrade()" class="flex items-center gap-1.5 bg-gradient-to-r from-amber-500 via-fuchsia-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all duration-300 shadow-lg hover:shadow-amber-500/25 active:scale-95 border border-amber-300/40">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    <span>Upgrade PRO</span>
+                </button>
+
                 <!-- Logged Out State -->
                 <button id="google-login-btn" onclick="loginWithGoogle()" class="flex items-center gap-2.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-indigo-500/30 hover:border-cyan-400/60 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 shadow-lg hover:shadow-cyan-500/10 active:scale-95">
                     <svg class="w-4 h-4" viewBox="0 0 24 24">
@@ -318,6 +324,37 @@
 
         let currentUserPlan = 'guest'; // สถานะผู้ใช้ปัจจุบัน: 'guest', 'free', 'pro'
 
+        // --- UPGRADE CHECKOUT SYSTEM ---
+        async function handleUpgrade() {
+            // ดึง userId ของคนที่ล็อกอินอยู่จาก Supabase Client (_supabase)
+            const { data: { user } } = await _supabase.auth.getUser();
+
+            if (!user) {
+                alert('กรุณาล็อกอินด้วย Google ก่อนทำการอัปเกรดเป็น PRO ครับ');
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id }),
+                });
+
+                const data = await res.json();
+
+                if (data.url) {
+                    // เปลี่ยนหน้าไปสแกน PromptPay / ชำระเงินบน Stripe
+                    window.location.href = data.url;
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + (data.error || 'ไม่สามารถสร้างลิงก์ชำระเงินได้'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('ไม่สามารถเชื่อมต่อระบบชำระเงินได้');
+            }
+        }
+
         // --- AUTH & PLAN SYSTEM ---
         async function loginWithGoogle() {
             try {
@@ -344,6 +381,7 @@
             const googleBtn = document.getElementById('google-login-btn');
             const userProfile = document.getElementById('user-profile');
             const planBadge = document.getElementById('plan-badge');
+            const upgradeBtn = document.getElementById('upgrade-btn');
 
             if (session && session.user) {
                 const user = session.user;
@@ -374,9 +412,11 @@
                 if (currentUserPlan === 'pro') {
                     planBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-fuchsia-500 text-white font-bold border border-amber-300 uppercase tracking-widest ml-1 shadow-lg";
                     planBadge.innerText = "PRO MEMBER (Unlimited)";
+                    if (upgradeBtn) upgradeBtn.classList.add('hidden'); // ซ่อนปุ่ม Upgrade ถ้าเป็น Pro แล้ว
                 } else {
                     planBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40 uppercase tracking-widest ml-1";
                     planBadge.innerText = "FREE PLAN (Max 10m)";
+                    if (upgradeBtn) upgradeBtn.classList.remove('hidden');
                 }
 
             } else {
@@ -385,6 +425,7 @@
                 userProfile.classList.add('hidden');
                 planBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-600 uppercase tracking-widest ml-1";
                 planBadge.innerText = "GUEST (Max 3m)";
+                if (upgradeBtn) upgradeBtn.classList.remove('hidden');
             }
         }
 
@@ -559,14 +600,14 @@
             tempVideo.onloadedmetadata = async () => {
                 const durationSec = tempVideo.duration;
 
-                // --- 🛑 STEP 2: CHECK QUOTA & DURATION LIMIT ---
+                // --- CHECK QUOTA & DURATION LIMIT ---
                 if (currentUserPlan === 'guest' && durationSec > 180) {
-                    alert("⚠️ โควต้าผู้ใช้ทั่วไป (Guest) ตัดวิดีโอได้สูงสุด 3 นาทีครับ\n\nโปรดกด 'Sign in with Google' ด้านบนเพื่อปลดล็อกสิทธิ์ฟรี 10 นาที!");
+                    alert("⚠️ โควต้าผู้ใช้ทั่วไป (Guest) ตัดวิดีโอได้สูงสุด 3 นาทีครับ\n\nโปรดกด 'Sign in with Google' ด้านบนเพื่อปลดล็อกสิทธิ์ฟรี 10 นาที หรือ Upgrade PRO เพื่อไม่จำกัดความยาว!");
                     return;
                 }
 
                 if (currentUserPlan === 'free' && durationSec > 600) {
-                    alert("⚠️ โควต้าฟรี (Free Plan) ตัดวิดีโอได้สูงสุด 10 นาทีครับ\n\nวิดีโอนี้ยาว " + (durationSec/60).toFixed(1) + " นาที โปรดอัปเกรดเป็นสาย PRO เพื่อตัดแบบไม่จำกัด!");
+                    alert("⚠️ โควต้าฟรี (Free Plan) ตัดวิดีโอได้สูงสุด 10 นาทีครับ\n\nวิดีโอนี้ยาว " + (durationSec/60).toFixed(1) + " นาที โปรดกดปุ่ม Upgrade PRO เพื่อปลดล็อกการตัดแบบไม่จำกัด!");
                     return;
                 }
 
