@@ -21,7 +21,6 @@
             background-attachment: fixed;
         }
 
-        /* Glassmorphism Cards */
         .glass-panel {
             background: rgba(15, 23, 42, 0.65);
             backdrop-filter: blur(16px);
@@ -38,7 +37,6 @@
             box-shadow: 0 0 25px rgba(168, 85, 247, 0.15);
         }
 
-        /* Preset & Speed Buttons */
         .preset-btn.active {
             background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
             color: #ffffff;
@@ -53,42 +51,21 @@
             box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
         }
 
-        /* Custom Scrollbar */
-        .waveform-scroll::-webkit-scrollbar {
-            height: 6px;
-        }
-        .waveform-scroll::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.8);
-        }
-        .waveform-scroll::-webkit-scrollbar-thumb {
-            background: rgba(99, 102, 241, 0.5);
-            border-radius: 9999px;
-        }
-        .waveform-scroll::-webkit-scrollbar-thumb:hover {
-            background: #a855f7;
-        }
+        .waveform-scroll::-webkit-scrollbar { height: 6px; }
+        .waveform-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.8); }
+        .waveform-scroll::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.5); border-radius: 9999px; }
+        .waveform-scroll::-webkit-scrollbar-thumb:hover { background: #a855f7; }
 
-        /* Cosmic Pulse & Neon Glows */
-        .glow-cyan {
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
-        }
-        .glow-purple {
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
-        }
-        
-        /* Custom Input Range Styling */
-        input[type=range] {
-            accent-color: #a855f7;
-        }
+        .glow-purple { box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+        input[type=range] { accent-color: #a855f7; }
     </style>
 </head>
 <body class="text-slate-100 min-h-screen pb-12 select-none relative overflow-x-hidden">
 
-    <!-- Ambient Floating Cosmic Stars Effect -->
+    <!-- Ambient Stars -->
     <div class="fixed inset-0 pointer-events-none z-0">
         <div class="absolute top-1/4 left-1/3 w-1 h-1 bg-white rounded-full animate-ping opacity-75"></div>
         <div class="absolute top-2/3 right-1/4 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse opacity-60"></div>
-        <div class="absolute top-10 right-10 w-1 h-1 bg-purple-300 rounded-full opacity-50"></div>
     </div>
 
     <!-- Header -->
@@ -100,15 +77,15 @@
                 </div>
                 <div>
                     <h1 class="text-lg font-extrabold tracking-wider bg-gradient-to-r from-cyan-400 via-fuchsia-300 to-indigo-300 bg-clip-text text-transparent">
-                        AUTOCUT PRO <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-950/80 text-cyan-300 border border-indigo-500/30 uppercase tracking-widest ml-1">Cosmic Edition</span>
+                        AUTOCUT PRO <span id="plan-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-600 uppercase tracking-widest ml-1">GUEST (Max 3m)</span>
                     </h1>
                     <p class="text-[10px] text-slate-400">AI-Powered Silence Cutter & Highlight Finder</p>
                 </div>
             </div>
 
-            <!-- Auth Section (Google Sign-In / User Profile) -->
+            <!-- Auth Section -->
             <div class="flex items-center gap-3">
-                <!-- Logged Out State: Google Sign-In Button -->
+                <!-- Logged Out State -->
                 <button id="google-login-btn" onclick="loginWithGoogle()" class="flex items-center gap-2.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-indigo-500/30 hover:border-cyan-400/60 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 shadow-lg hover:shadow-cyan-500/10 active:scale-95">
                     <svg class="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
@@ -119,9 +96,9 @@
                     <span>Sign in with Google</span>
                 </button>
 
-                <!-- Logged In State: User Info & Logout (Hidden by default) -->
+                <!-- Logged In State -->
                 <div id="user-profile" class="hidden flex items-center gap-3 bg-slate-900/90 border border-indigo-500/30 px-3 py-1.5 rounded-xl shadow-lg">
-                    <img id="user-avatar" src="" alt="Avatar text-slate-400" class="w-7 h-7 rounded-full border border-cyan-400">
+                    <img id="user-avatar" src="" alt="Avatar" class="w-7 h-7 rounded-full border border-cyan-400">
                     <div class="text-left hidden sm:block">
                         <div id="user-name" class="text-xs font-bold text-cyan-300">User Name</div>
                         <div id="user-email" class="text-[9px] font-mono text-slate-400">user@email.com</div>
@@ -136,7 +113,7 @@
 
     <main class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
 
-        <!-- Left Column: Waveform Studio & Controls -->
+        <!-- Left Column -->
         <div class="lg:col-span-8 space-y-6">
 
             <!-- Folder Path Input Panel -->
@@ -148,12 +125,9 @@
                     <input type="text" id="folder-path-input" placeholder="เช่น C:\from OBS หรือ D:\Projects\Game" 
                         class="w-full bg-slate-950/80 border border-indigo-500/30 rounded-xl px-4 py-3 text-xs text-cyan-200 font-mono focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition placeholder:text-slate-600 shadow-inner">
                 </div>
-                <p class="text-[11px] text-slate-400 flex items-center gap-1">
-                    คัดลอก Path จาก Address Bar ใน Windows Explorer มาวาง (Ctrl+V) ที่นี่ได้เลย
-                </p>
             </div>
 
-            <!-- Main Waveform Studio -->
+            <!-- Waveform Studio -->
             <div class="glass-panel rounded-2xl p-5 space-y-4 relative overflow-hidden shadow-2xl">
                 <div class="flex justify-between items-center px-1">
                     <span class="text-xs font-bold text-slate-200 flex items-center gap-2 tracking-wide">
@@ -164,69 +138,60 @@
                     </span>
                 </div>
 
-                <!-- Main Display Container -->
+                <!-- Display Canvas -->
                 <div class="relative bg-slate-950/90 border border-indigo-500/20 rounded-xl overflow-hidden shadow-inner group">
-                    
-                    <!-- Waveform Scroll Viewport -->
                     <div id="waveform-viewport" class="waveform-scroll overflow-x-auto overflow-y-hidden relative h-64 w-full cursor-pointer">
                         <canvas id="waveform-canvas" class="block h-full"></canvas>
                     </div>
 
-                    <!-- Overlay Controls (Play/Speed & Zoom) -->
                     <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center pointer-events-none z-10">
-                        
-                        <!-- Left: Playback Controls -->
                         <div class="flex items-center gap-2 bg-slate-950/90 backdrop-blur-md border border-indigo-500/30 rounded-xl p-1.5 pointer-events-auto shadow-2xl">
                             <button id="play-pause-btn" class="px-2.5 py-1 hover:bg-indigo-900/50 rounded-lg text-xs font-mono font-bold text-slate-200 transition">
                                 PLAY
                             </button>
                             <div class="h-4 w-[1px] bg-indigo-500/30"></div>
                             <div class="flex gap-1 text-[10px] font-mono">
-                                <button class="speed-btn active px-2 py-0.5 rounded-md text-slate-300 hover:bg-indigo-950 border border-transparent transition" data-speed="1">x1</button>
-                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 hover:bg-indigo-950 border border-transparent transition" data-speed="1.2">x1.2</button>
-                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 hover:bg-indigo-950 border border-transparent transition" data-speed="1.5">x1.5</button>
-                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 hover:bg-indigo-950 border border-transparent transition" data-speed="1.7">x1.7</button>
-                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 hover:bg-indigo-950 border border-transparent transition" data-speed="2">x2</button>
+                                <button class="speed-btn active px-2 py-0.5 rounded-md text-slate-300 transition" data-speed="1">x1</button>
+                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition" data-speed="1.2">x1.2</button>
+                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition" data-speed="1.5">x1.5</button>
+                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition" data-speed="1.7">x1.7</button>
+                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition" data-speed="2">x2</button>
                             </div>
                         </div>
 
-                        <!-- Right: Zoom Controls -->
                         <div class="flex items-center gap-2 bg-slate-950/90 backdrop-blur-md border border-indigo-500/30 rounded-xl px-3 py-1.5 pointer-events-auto shadow-2xl">
                             <span class="text-[10px] font-mono uppercase text-slate-400">Zoom</span>
-                            <button id="zoom-out-btn" class="text-xs text-slate-400 hover:text-cyan-400 px-1 font-bold transition">-</button>
+                            <button id="zoom-out-btn" class="text-xs text-slate-400 hover:text-cyan-400 px-1 font-bold">-</button>
                             <input type="range" id="zoom-slider" min="1" max="10" step="0.1" value="1" class="w-24 accent-fuchsia-500 h-1 bg-slate-800 rounded cursor-pointer">
-                            <button id="zoom-in-btn" class="text-xs text-slate-400 hover:text-cyan-400 px-1 font-bold transition">+</button>
+                            <button id="zoom-in-btn" class="text-xs text-slate-400 hover:text-cyan-400 px-1 font-bold">+</button>
                             <span id="zoom-val" class="text-[10px] font-mono text-fuchsia-400 font-bold w-6 text-right">1x</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Visual Legend -->
                 <div class="flex justify-center items-center gap-6 text-[11px] font-mono text-slate-400 py-1 border-t border-indigo-500/10">
                     <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-cyan-500/80 inline-block shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span> Margins</span>
                     <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-600/80 inline-block shadow-[0_0_8px_rgba(225,29,72,0.8)]"></span> Silences</span>
-                    <span class="flex items-center gap-1.5"><span class="w-4 h-[2px] bg-fuchsia-500 inline-block shadow-[0_0_8px_rgba(217,70,239,1)]"></span> Noise Threshold</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2 h-3 bg-cyan-400 inline-block rounded-xs shadow-[0_0_8px_rgba(56,189,248,1)]"></span> Playhead</span>
+                    <span class="flex items-center gap-1.5"><span class="w-4 h-[2px] bg-fuchsia-500 inline-block"></span> Noise Threshold</span>
                 </div>
 
-                <!-- Mini-map Navigator -->
-                <div class="relative h-12 bg-slate-950 border border-indigo-500/20 rounded-xl overflow-hidden cursor-grab active:cursor-grabbing select-none shadow-inner" id="minimap-container">
+                <div class="relative h-12 bg-slate-950 border border-indigo-500/20 rounded-xl overflow-hidden cursor-grab active:cursor-grabbing shadow-inner" id="minimap-container">
                     <canvas id="minimap-canvas" class="w-full h-full block"></canvas>
-                    <div id="minimap-viewport-box" class="absolute top-0 bottom-0 border-2 border-fuchsia-500 bg-fuchsia-500/20 rounded-lg transition-none pointer-events-none shadow-[0_0_15px_rgba(217,70,239,0.3)]"></div>
+                    <div id="minimap-viewport-box" class="absolute top-0 bottom-0 border-2 border-fuchsia-500 bg-fuchsia-500/20 rounded-lg pointer-events-none"></div>
                     <div class="absolute bottom-1 left-2 text-[9px] font-mono text-slate-500 pointer-events-none" id="time-start-label">00:00</div>
                     <div class="absolute bottom-1 right-2 text-[9px] font-mono text-slate-500 pointer-events-none" id="time-end-label">00:00</div>
                 </div>
             </div>
 
-            <!-- Video Player & Upload Zone -->
+            <!-- Upload Zone -->
             <div class="glass-panel rounded-2xl p-5 grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
                 <div id="drop-zone" class="border-2 border-dashed border-indigo-500/30 hover:border-cyan-400 bg-slate-950/40 rounded-xl p-6 text-center cursor-pointer transition-all duration-300 group">
                     <input type="file" id="video-input" accept="video/*" class="hidden">
                     <div class="space-y-2 pointer-events-none">
-                        <div class="w-10 h-10 rounded-full bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center mx-auto text-cyan-400 font-mono font-bold text-lg group-hover:scale-110 group-hover:border-cyan-400 transition-all duration-300">
+                        <div class="w-10 h-10 rounded-full bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center mx-auto text-cyan-400 font-mono font-bold text-lg group-hover:scale-110 transition-all duration-300">
                             +
                         </div>
-                        <p class="text-xs font-semibold text-slate-200 group-hover:text-cyan-300 transition-colors">วางไฟล์วิดีโอที่นี่ หรือคลิกเพื่อเลือกไฟล์</p>
+                        <p class="text-xs font-semibold text-slate-200">วางไฟล์วิดีโอที่นี่ หรือคลิกเพื่อเลือกไฟล์</p>
                         <p id="path-preview" class="text-[10px] font-mono text-fuchsia-400 truncate max-w-xs mx-auto hidden"></p>
                     </div>
                 </div>
@@ -239,16 +204,16 @@
                 </div>
             </div>
 
-            <!-- Settings Panel -->
+            <!-- Settings -->
             <div class="glass-panel rounded-2xl p-6 space-y-6">
                 <div>
-                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-3">Presets (สไตล์การตัด)</label>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-3">Presets</label>
                     <div class="flex flex-wrap gap-2.5" id="presets-container">
-                        <button class="preset-btn px-4 py-2 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs font-medium text-slate-300 hover:border-indigo-400 transition" data-preset="calm">Calm</button>
-                        <button class="preset-btn px-4 py-2 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs font-medium text-slate-300 hover:border-indigo-400 transition" data-preset="measured">Measured</button>
-                        <button class="preset-btn active px-4 py-2 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs font-medium text-slate-300 hover:border-indigo-400 transition" data-preset="paced">Paced</button>
-                        <button class="preset-btn px-4 py-2 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs font-medium text-slate-300 hover:border-indigo-400 transition" data-preset="energetic">Energetic</button>
-                        <button class="preset-btn px-4 py-2 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs font-medium text-slate-300 hover:border-indigo-400 transition" data-preset="jumpy">Jumpy</button>
+                        <button class="preset-btn px-4 py-2 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300" data-preset="calm">Calm</button>
+                        <button class="preset-btn px-4 py-2 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300" data-preset="measured">Measured</button>
+                        <button class="preset-btn active px-4 py-2 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300" data-preset="paced">Paced</button>
+                        <button class="preset-btn px-4 py-2 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300" data-preset="energetic">Energetic</button>
+                        <button class="preset-btn px-4 py-2 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300" data-preset="jumpy">Jumpy</button>
                     </div>
                 </div>
 
@@ -259,26 +224,24 @@
                         <div>
                             <label class="text-xs text-slate-400 block mb-1.5">Remove Silences Longer Than</label>
                             <div class="relative">
-                                <input type="number" id="remove-silence-ms" value="200" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-400 transition shadow-inner">
+                                <input type="number" id="remove-silence-ms" value="200" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
                                 <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
                             </div>
                         </div>
-
                         <div>
-                            <label class="text-xs text-slate-400 block mb-1.5">Margin Before By (Padding Head)</label>
+                            <label class="text-xs text-slate-400 block mb-1.5">Margin Before By</label>
                             <div class="relative">
-                                <input type="number" id="margin-before-ms" value="50" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-400 transition shadow-inner">
+                                <input type="number" id="margin-before-ms" value="50" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
                                 <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
                             </div>
                         </div>
-
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
                                 <label class="text-xs text-slate-400">Minimum Time Between Cuts</label>
                                 <input type="checkbox" id="enable-min-cut" checked class="accent-fuchsia-500 cursor-pointer">
                             </div>
                             <div class="relative">
-                                <input type="number" id="min-cut-ms" value="800" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-400 transition shadow-inner">
+                                <input type="number" id="min-cut-ms" value="800" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
                                 <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
                             </div>
                         </div>
@@ -288,40 +251,35 @@
                         <div>
                             <label class="text-xs text-slate-400 block mb-1.5">Keep Talks Longer Than</label>
                             <div class="relative">
-                                <input type="number" id="keep-talks-ms" value="100" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-400 transition shadow-inner">
+                                <input type="number" id="keep-talks-ms" value="100" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
                                 <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
                             </div>
                         </div>
-
                         <div>
-                            <label class="text-xs text-slate-400 block mb-1.5">Margin After By (Padding Tail)</label>
+                            <label class="text-xs text-slate-400 block mb-1.5">Margin After By</label>
                             <div class="relative">
-                                <input type="number" id="margin-after-ms" value="50" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs font-mono text-cyan-300 focus:outline-none focus:border-cyan-400 transition shadow-inner">
+                                <input type="number" id="margin-after-ms" value="50" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
                                 <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
                             </div>
                         </div>
-
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
-                                <label class="text-xs text-fuchsia-400 font-semibold">Silence Threshold (Sensitivity)</label>
+                                <label class="text-xs text-fuchsia-400 font-semibold">Silence Threshold</label>
                                 <span id="thresh-val" class="text-xs font-mono text-fuchsia-400 font-bold">-35dB</span>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <input type="range" id="threshold-db" min="-60" max="-15" value="-35" class="w-full bg-slate-800 cursor-pointer">
-                            </div>
-                            <p class="text-[10px] text-slate-500 mt-1">เลื่อนปรับ dB เพื่อดูเส้น Noise Threshold สีชมพูขยับเรียลไทม์</p>
+                            <input type="range" id="threshold-db" min="-60" max="-15" value="-35" class="w-full bg-slate-800 cursor-pointer">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Column: Results & Export -->
+        <!-- Right Column -->
         <div class="lg:col-span-4 space-y-6">
             <div class="glass-panel rounded-2xl p-5 space-y-4">
                 <h2 class="text-sm font-bold text-slate-200 flex justify-between items-center border-b border-indigo-500/20 pb-3">
                     <span>รายการคลิปที่ถูกตัด</span>
-                    <span id="clip-count" class="text-xs font-mono text-cyan-300 bg-cyan-950/80 px-3 py-1 rounded-full border border-cyan-500/30 shadow-md">0 Clips</span>
+                    <span id="clip-count" class="text-xs font-mono text-cyan-300 bg-cyan-950/80 px-3 py-1 rounded-full border border-cyan-500/30">0 Clips</span>
                 </h2>
 
                 <div id="clips-list" class="max-h-[380px] overflow-y-auto space-y-2 pr-1 text-xs text-slate-300 font-mono">
@@ -329,31 +287,24 @@
                 </div>
 
                 <div id="export-group" class="hidden pt-3 border-t border-indigo-500/20">
-                    <button id="export-xml-btn" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-fuchsia-600 hover:from-indigo-500 hover:to-fuchsia-500 text-white text-xs font-bold rounded-xl transition-all duration-200 shadow-lg shadow-indigo-600/30">
+                    <button id="export-xml-btn" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white text-xs font-bold rounded-xl shadow-lg">
                         Export Premiere (.XML)
                     </button>
                 </div>
             </div>
 
-            <!-- Groq AI Highlight Finder -->
-            <div class="glass-panel rounded-2xl p-5 space-y-4 relative overflow-hidden">
-                <div class="absolute -top-10 -right-10 w-28 h-28 bg-fuchsia-500/10 rounded-full blur-2xl pointer-events-none"></div>
-
-                <h2 class="text-sm font-bold text-slate-200 flex items-center gap-2 border-b border-indigo-500/20 pb-3">
-                    Groq AI Highlight Finder
-                </h2>
-
+            <!-- Groq AI -->
+            <div class="glass-panel rounded-2xl p-5 space-y-4">
+                <h2 class="text-sm font-bold text-slate-200 border-b border-indigo-500/20 pb-3">Groq AI Highlight Finder</h2>
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1.5">Groq API Key (gsk_...)</label>
-                    <input type="password" id="api-key" placeholder="วาง API Key จาก console.groq.com" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-fuchsia-400 transition shadow-inner">
+                    <label class="block text-xs text-slate-400 mb-1.5">Groq API Key</label>
+                    <input type="password" id="api-key" placeholder="วาง API Key จาก console.groq.com" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 font-mono">
                 </div>
-
-                <button id="ai-analyze-btn" disabled class="w-full py-3 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-600 text-white font-bold text-xs rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20">
+                <button id="ai-analyze-btn" disabled class="w-full py-3 bg-gradient-to-r from-cyan-500 to-indigo-600 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-600 text-white font-bold text-xs rounded-xl shadow-lg">
                     วิเคราะห์หาช็อตเด็ดด้วย Groq AI
                 </button>
-
-                <div id="ai-result-box" class="hidden mt-2 p-4 bg-slate-950/90 border border-indigo-500/30 rounded-xl text-xs text-slate-300 leading-relaxed max-h-52 overflow-y-auto shadow-inner">
-                    <strong class="text-cyan-400 block mb-1.5 flex items-center gap-1.5">คำแนะนำจาก Groq AI:</strong>
+                <div id="ai-result-box" class="hidden mt-2 p-4 bg-slate-950/90 border border-indigo-500/30 rounded-xl text-xs text-slate-300 leading-relaxed max-h-52 overflow-y-auto">
+                    <strong class="text-cyan-400 block mb-1.5">คำแนะนำจาก Groq AI:</strong>
                     <div id="ai-result-text">กำลังประมวลผล...</div>
                 </div>
             </div>
@@ -361,44 +312,39 @@
     </main>
 
     <script>
-        // Supabase Initialization
         const SUPABASE_URL = 'https://gfjwpkuutrriavympmez.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_nW5HkRj0maBmBP1Kj-pmsQ_TAQDavKD';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // --- GOOGLE AUTH FUNCTIONS ---
+        let currentUserPlan = 'guest'; // สถานะผู้ใช้ปัจจุบัน: 'guest', 'free', 'pro'
+
+        // --- AUTH & PLAN SYSTEM ---
         async function loginWithGoogle() {
             try {
                 const { error } = await _supabase.auth.signInWithOAuth({
                     provider: 'google',
-                    options: {
-                        redirectTo: window.location.origin + window.location.pathname
-                    }
+                    options: { redirectTo: window.location.origin + window.location.pathname }
                 });
                 if (error) throw error;
-            } catch (err) {
-                alert("เกิดข้อผิดพลาดในการล็อกอิน: " + err.message);
-            }
+            } catch (err) { alert("เกิดข้อผิดพลาดในการล็อกอิน: " + err.message); }
         }
 
         async function logout() {
             try {
                 const { error } = await _supabase.auth.signOut();
                 if (error) throw error;
-            } catch (err) {
-                alert("เกิดข้อผิดพลาดในการออกจากระบบ: " + err.message);
-            }
+            } catch (err) { alert("เกิดข้อผิดพลาดในการออกจากระบบ: " + err.message); }
         }
 
-        // Auth State Listener (อัปเดต UI เมื่อมีการเข้าสู่ระบบ/ออกจากระบบ)
-        _supabase.auth.onAuthStateChange((event, session) => {
-            updateAuthUI(session);
+        _supabase.auth.onAuthStateChange(async (event, session) => {
+            await updateAuthAndPlanUI(session);
         });
 
-        function updateAuthUI(session) {
+        async function updateAuthAndPlanUI(session) {
             const googleBtn = document.getElementById('google-login-btn');
             const userProfile = document.getElementById('user-profile');
-            
+            const planBadge = document.getElementById('plan-badge');
+
             if (session && session.user) {
                 const user = session.user;
                 document.getElementById('user-name').innerText = user.user_metadata.full_name || 'User';
@@ -407,16 +353,44 @@
 
                 googleBtn.classList.add('hidden');
                 userProfile.classList.remove('hidden');
+
+                // ดึงข้อมูลสถานะ Plan จาก Supabase Database Table 'profiles'
+                try {
+                    const { data, error } = await _supabase
+                        .from('profiles')
+                        .select('plan_type')
+                        .eq('id', user.id)
+                        .single();
+
+                    if (data && data.plan_type) {
+                        currentUserPlan = data.plan_type;
+                    } else {
+                        currentUserPlan = 'free';
+                    }
+                } catch (e) {
+                    currentUserPlan = 'free';
+                }
+
+                if (currentUserPlan === 'pro') {
+                    planBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-fuchsia-500 text-white font-bold border border-amber-300 uppercase tracking-widest ml-1 shadow-lg";
+                    planBadge.innerText = "PRO MEMBER (Unlimited)";
+                } else {
+                    planBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40 uppercase tracking-widest ml-1";
+                    planBadge.innerText = "FREE PLAN (Max 10m)";
+                }
+
             } else {
+                currentUserPlan = 'guest';
                 googleBtn.classList.remove('hidden');
                 userProfile.classList.add('hidden');
+                planBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-600 uppercase tracking-widest ml-1";
+                planBadge.innerText = "GUEST (Max 3m)";
             }
         }
 
-        // ตรวจสอบ Session เมื่อเปิดหน้าเว็บขึ้นมา
         window.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await _supabase.auth.getSession();
-            updateAuthUI(session);
+            await updateAuthAndPlanUI(session);
         });
 
         // --- APP CONTROLS & AUDIO PROCESSING ---
@@ -444,7 +418,6 @@
         const minCutMs = document.getElementById('min-cut-ms');
         const enableMinCut = document.getElementById('enable-min-cut');
 
-        // Waveform Visualizer Elements
         const waveformViewport = document.getElementById('waveform-viewport');
         const waveformCanvas = document.getElementById('waveform-canvas');
         const minimapCanvas = document.getElementById('minimap-canvas');
@@ -464,7 +437,6 @@
         let currentZoom = 1;
         let isDraggingMinimap = false;
 
-        // Sync Event Listeners
         thresholdInput.addEventListener('input', (e) => {
             threshVal.innerText = `${e.target.value}dB`;
             recalculateAndRender();
@@ -491,7 +463,6 @@
             });
         });
 
-        // Zoom Controls Logic
         zoomSlider.addEventListener('input', (e) => {
             currentZoom = parseFloat(e.target.value);
             zoomVal.innerText = `${currentZoom.toFixed(1)}x`;
@@ -510,53 +481,33 @@
 
         waveformViewport.addEventListener('scroll', updateMinimapViewport);
 
-        // Click Waveform Canvas to Seek Playhead
         waveformCanvas.addEventListener('click', (e) => {
             if (!audioBuffer) return;
             const rect = waveformCanvas.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
             const totalDuration = audioBuffer.duration;
             const targetTime = (clickX / waveformCanvas.width) * totalDuration;
-            
             videoPlayer.currentTime = Math.max(0, Math.min(totalDuration, targetTime));
             renderWaveform();
         });
 
-        // Draggable Minimap Viewport Logic
         function handleMinimapDrag(e) {
             if (!audioBuffer) return;
             const rect = minimapContainer.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
             const percent = Math.max(0, Math.min(1, clickX / rect.width));
-
             const totalWidth = waveformCanvas.width;
             const viewportWidth = waveformViewport.clientWidth;
             const targetScrollLeft = (percent * totalWidth) - (viewportWidth / 2);
-
             waveformViewport.scrollLeft = Math.max(0, Math.min(totalWidth - viewportWidth, targetScrollLeft));
         }
 
-        minimapContainer.addEventListener('mousedown', (e) => {
-            isDraggingMinimap = true;
-            handleMinimapDrag(e);
-        });
+        minimapContainer.addEventListener('mousedown', (e) => { isDraggingMinimap = true; handleMinimapDrag(e); });
+        window.addEventListener('mousemove', (e) => { if (isDraggingMinimap) handleMinimapDrag(e); });
+        window.addEventListener('mouseup', () => { isDraggingMinimap = false; });
 
-        window.addEventListener('mousemove', (e) => {
-            if (isDraggingMinimap) {
-                handleMinimapDrag(e);
-            }
-        });
-
-        window.addEventListener('mouseup', () => {
-            isDraggingMinimap = false;
-        });
-
-        // Playhead Update Events
         videoPlayer.addEventListener('timeupdate', renderWaveform);
-        videoPlayer.addEventListener('play', () => {
-            playPauseBtn.innerText = 'PAUSE';
-            animPlayheadLoop();
-        });
+        videoPlayer.addEventListener('play', () => { playPauseBtn.innerText = 'PAUSE'; animPlayheadLoop(); });
         videoPlayer.addEventListener('pause', () => playPauseBtn.innerText = 'PLAY');
 
         function animPlayheadLoop() {
@@ -566,27 +517,20 @@
             }
         }
 
-        // Speed Multipliers
         document.querySelectorAll('.speed-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
-                const speed = parseFloat(e.target.getAttribute('data-speed'));
-                videoPlayer.playbackRate = speed;
+                videoPlayer.playbackRate = parseFloat(e.target.getAttribute('data-speed'));
             });
         });
 
         playPauseBtn.addEventListener('click', () => {
-            if (videoPlayer.paused) {
-                videoPlayer.play();
-            } else {
-                videoPlayer.pause();
-            }
+            if (videoPlayer.paused) videoPlayer.play();
+            else videoPlayer.pause();
         });
 
-        // Drag and Drop Video File Events
         dropZone.addEventListener('click', () => videoInput.click());
-
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
             dropZone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
         });
@@ -603,38 +547,53 @@
             if (file && file.path) {
                 const fullPath = file.path;
                 const lastSlash = Math.max(fullPath.lastIndexOf('\\'), fullPath.lastIndexOf('/'));
-                if (lastSlash !== -1) {
-                    folderPathInput.value = fullPath.substring(0, lastSlash);
-                }
+                if (lastSlash !== -1) folderPathInput.value = fullPath.substring(0, lastSlash);
             }
         }
 
         async function handleVideoFile(file) {
             loadedFileName = file.name;
-            videoPlayer.src = URL.createObjectURL(file);
-            videoPlayer.classList.remove('hidden');
-            videoPlaceholder.classList.add('hidden');
+            const tempVideo = document.createElement('video');
+            tempVideo.src = URL.createObjectURL(file);
 
-            pathPreview.innerText = file.name;
-            pathPreview.classList.remove('hidden');
+            tempVideo.onloadedmetadata = async () => {
+                const durationSec = tempVideo.duration;
 
-            extractAndSetFolderPath(file);
+                // --- 🛑 STEP 2: CHECK QUOTA & DURATION LIMIT ---
+                if (currentUserPlan === 'guest' && durationSec > 180) {
+                    alert("⚠️ โควต้าผู้ใช้ทั่วไป (Guest) ตัดวิดีโอได้สูงสุด 3 นาทีครับ\n\nโปรดกด 'Sign in with Google' ด้านบนเพื่อปลดล็อกสิทธิ์ฟรี 10 นาที!");
+                    return;
+                }
 
-            document.getElementById('clips-list').innerHTML = `<p class="text-cyan-400 text-center py-10 font-mono animate-pulse">กำลังสแกนความถี่คลื่นเสียง...</p>`;
+                if (currentUserPlan === 'free' && durationSec > 600) {
+                    alert("⚠️ โควต้าฟรี (Free Plan) ตัดวิดีโอได้สูงสุด 10 นาทีครับ\n\nวิดีโอนี้ยาว " + (durationSec/60).toFixed(1) + " นาที โปรดอัปเกรดเป็นสาย PRO เพื่อตัดแบบไม่จำกัด!");
+                    return;
+                }
 
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                // หากผ่านเงื่อนไข ให้ประมวลผลต่อ
+                videoPlayer.src = tempVideo.src;
+                videoPlayer.classList.remove('hidden');
+                videoPlaceholder.classList.add('hidden');
+                pathPreview.innerText = file.name;
+                pathPreview.classList.remove('hidden');
+                extractAndSetFolderPath(file);
 
-                document.getElementById('time-start-label').innerText = "00:00";
-                document.getElementById('time-end-label').innerText = formatTimecode(audioBuffer.duration);
+                document.getElementById('clips-list').innerHTML = `<p class="text-cyan-400 text-center py-10 font-mono animate-pulse">กำลังสแกนความถี่คลื่นเสียง...</p>`;
 
-                generatePeaksData();
-                recalculateAndRender();
-            } catch (err) {
-                alert("อ่านไฟล์เสียงล้มเหลว: " + err.message);
-            }
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+                    document.getElementById('time-start-label').innerText = "00:00";
+                    document.getElementById('time-end-label').innerText = formatTimecode(audioBuffer.duration);
+
+                    generatePeaksData();
+                    recalculateAndRender();
+                } catch (err) {
+                    alert("อ่านไฟล์เสียงล้มเหลว: " + err.message);
+                }
+            };
         }
 
         function generatePeaksData() {
@@ -642,11 +601,8 @@
             const numChannels = audioBuffer.numberOfChannels;
             const samplesPerPeak = Math.floor(audioBuffer.sampleRate * 0.01); 
             const numPeaks = Math.floor(audioBuffer.length / samplesPerPeak);
-            
             const channels = [];
-            for (let c = 0; c < numChannels; c++) {
-                channels.push(audioBuffer.getChannelData(c));
-            }
+            for (let c = 0; c < numChannels; c++) channels.push(audioBuffer.getChannelData(c));
 
             downsampledPeaks = new Float32Array(numPeaks);
             for (let i = 0; i < numPeaks; i++) {
@@ -658,8 +614,7 @@
                         sum += val * val;
                     }
                 }
-                const rms = Math.sqrt(sum / (samplesPerPeak * numChannels));
-                downsampledPeaks[i] = rms;
+                downsampledPeaks[i] = Math.sqrt(sum / (samplesPerPeak * numChannels));
             }
         }
 
@@ -702,9 +657,7 @@
                         }
                     }
                 }
-                if (isSpeech) {
-                    rawClips.push({ start: speechStart, end: totalDuration });
-                }
+                if (isSpeech) rawClips.push({ start: speechStart, end: totalDuration });
 
                 activeClips = mergeClipsAdvanced(rawClips, removeSilenceSec, minCutSec);
                 
@@ -726,20 +679,14 @@
             for (let i = 1; i < clips.length; i++) {
                 let prev = merged[merged.length - 1];
                 let curr = clips[i];
-                if ((curr.start - prev.end) < removeSilenceSec) {
-                    prev.end = curr.end;
-                } else {
-                    merged.push(curr);
-                }
+                if ((curr.start - prev.end) < removeSilenceSec) prev.end = curr.end;
+                else merged.push(curr);
             }
 
-            if (minCutSec > 0) {
-                merged = merged.filter(c => (c.end - c.start) >= minCutSec);
-            }
+            if (minCutSec > 0) merged = merged.filter(c => (c.end - c.start) >= minCutSec);
             return merged;
         }
 
-        // Draw Waveform Canvas
         function renderWaveform() {
             if (!audioBuffer) return;
 
@@ -763,10 +710,8 @@
             activeClips.forEach(clip => {
                 const xStart = (clip.start / totalDuration) * canvasWidth;
                 const xEnd = (clip.end / totalDuration) * canvasWidth;
-                
                 ctx.fillStyle = '#090d16';
                 ctx.fillRect(xStart, 0, xEnd - xStart, canvasHeight);
-
                 ctx.fillStyle = 'rgba(6, 182, 212, 0.2)';
                 ctx.fillRect(xStart, 0, xEnd - xStart, canvasHeight);
             });
@@ -795,7 +740,6 @@
                 ctx.moveTo(x, 0);
                 ctx.lineTo(x, 15);
                 ctx.stroke();
-
                 ctx.fillText(formatTimecode(t), x + 4, 12);
             }
 
@@ -808,7 +752,6 @@
                 const db = rmsToDb(rms);
                 const y = dbToY(db, canvasHeight);
                 const height = canvasHeight - y;
-
                 ctx.fillRect(i * barWidth, canvasHeight - height, Math.max(1, barWidth - 0.5), height);
             }
 
@@ -825,7 +768,6 @@
 
             if (videoPlayer.duration) {
                 const playheadX = (videoPlayer.currentTime / totalDuration) * canvasWidth;
-                
                 ctx.strokeStyle = '#38bdf8';
                 ctx.lineWidth = 2.5;
                 ctx.shadowColor = '#38bdf8';
@@ -874,7 +816,6 @@
             const viewportWidth = waveformViewport.clientWidth;
             const scrollLeft = waveformViewport.scrollLeft;
             const totalWidth = waveformCanvas.width;
-
             if (totalWidth === 0) return;
 
             const boxWidthPercent = (viewportWidth / totalWidth) * 100;
@@ -886,15 +827,11 @@
 
         function rmsToDb(rms) {
             if (rms <= 0.00001) return -60;
-            const db = 20 * Math.log10(rms);
-            return Math.max(-60, Math.min(0, db));
+            return Math.max(-60, Math.min(0, 20 * Math.log10(rms)));
         }
 
         function dbToY(db, height) {
-            const minDb = -60;
-            const maxDb = 0;
-            const clamped = Math.max(minDb, Math.min(maxDb, db));
-            const norm = (clamped - minDb) / (maxDb - minDb);
+            const norm = (Math.max(-60, Math.min(0, db)) - (-60)) / 60;
             return height - (norm * (height - 25));
         }
 
@@ -916,7 +853,6 @@
 
             clips.forEach((clip, idx) => {
                 keptDuration += (clip.end - clip.start);
-
                 const item = document.createElement('div');
                 item.className = 'p-2.5 bg-slate-950/80 rounded-xl border border-indigo-500/20 flex justify-between items-center hover:border-cyan-400/60 hover:bg-slate-900 cursor-pointer transition shadow-sm';
                 item.innerHTML = `
@@ -926,7 +862,6 @@
                 item.onclick = () => {
                     videoPlayer.currentTime = clip.start;
                     videoPlayer.play();
-                    
                     const x = (clip.start / totalDuration) * waveformCanvas.width;
                     waveformViewport.scrollLeft = x - 50;
                 };
@@ -941,49 +876,38 @@
         function escapeXml(unsafe) {
             return unsafe.replace(/[<>&'"]/g, (c) => {
                 switch (c) {
-                    case '<': return '&lt;';
-                    case '>': return '&gt;';
-                    case '&': return '&amp;';
-                    case '\'': return '&apos;';
-                    case '"': return '&quot;';
-                    default: return c;
+                    case '<': return '&lt;'; case '>': return '&gt;';
+                    case '&': return '&amp;'; case '\'': return '&apos;';
+                    case '"': return '&quot;'; default: return c;
                 }
             });
         }
 
         function generateXML(fileName, clips, userFolderPath) {
-            const fps = 60;
-            const timebase = 60;
-            const safeFileName = escapeXml(fileName);
-
+            const fps = 60; const timebase = 60; const safeFileName = escapeXml(fileName);
             let pathUrlTag = '';
             if (userFolderPath && userFolderPath.trim() !== '') {
                 let cleanFolder = userFolderPath.trim().replace(/\\/g, '/');
                 if (!cleanFolder.startsWith('/')) cleanFolder = '/' + cleanFolder;
                 if (!cleanFolder.endsWith('/')) cleanFolder += '/';
-                const fullPath = cleanFolder + fileName;
-                pathUrlTag = `<pathurl>file://localhost${encodeURI(fullPath)}</pathurl>`;
+                pathUrlTag = `<pathurl>file://localhost${encodeURI(cleanFolder + fileName)}</pathurl>`;
             } else {
                 pathUrlTag = `<pathurl>file://localhost/${safeFileName}</pathurl>`;
             }
 
-            let videoTrackXml = '';
-            let audioTrack1Xml = '';
-            let currentTimelineFrame = 0; 
+            let videoTrackXml = ''; let audioTrack1Xml = ''; let currentTimelineFrame = 0; 
 
             clips.forEach((clip, idx) => {
                 let inFrame = Math.round(clip.start * fps);
                 let outFrame = Math.round(clip.end * fps);
                 const dur = outFrame - inFrame;
-                
                 const startTimeline = currentTimelineFrame;
                 const endTimeline = startTimeline + dur;
                 currentTimelineFrame = endTimeline;
 
                 const fileBlock = `
                         <file id="file-1">
-                            <name>${safeFileName}</name>
-                            ${pathUrlTag}
+                            <name>${safeFileName}</name>${pathUrlTag}
                             <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
                             <media>
                                 <video>
@@ -993,32 +917,12 @@
                                         <pixelaspectratio>square</pixelaspectratio>
                                     </samplecharacteristics>
                                 </video>
-                                <audio>
-                                    <samplecharacteristics><depth>16</depth><samplerate>48000</samplerate></samplecharacteristics>
-                                </audio>
+                                <audio><samplecharacteristics><depth>16</depth><samplerate>48000</samplerate></samplecharacteristics></audio>
                             </media>
                         </file>`;
 
-                videoTrackXml += `
-                <clipitem id="clipitem-v-${idx + 1}">
-                    <name>${safeFileName}</name>
-                    <duration>${dur}</duration>
-                    <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
-                    <start>${startTimeline}</start><end>${endTimeline}</end>
-                    <in>${inFrame}</in><out>${outFrame}</out>
-                    ${fileBlock}
-                </clipitem>`;
-
-                audioTrack1Xml += `
-                <clipitem id="clipitem-a1-${idx + 1}">
-                    <name>${safeFileName}</name>
-                    <duration>${dur}</duration>
-                    <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
-                    <start>${startTimeline}</start><end>${endTimeline}</end>
-                    <in>${inFrame}</in><out>${outFrame}</out>
-                    ${fileBlock}
-                    <sourcetrack><mediatype>audio</mediatype><trackindex>1</trackindex></sourcetrack>
-                </clipitem>`;
+                videoTrackXml += `<clipitem id="clipitem-v-${idx + 1}"><name>${safeFileName}</name><duration>${dur}</duration><rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate><start>${startTimeline}</start><end>${endTimeline}</end><in>${inFrame}</in><out>${outFrame}</out>${fileBlock}</clipitem>`;
+                audioTrack1Xml += `<clipitem id="clipitem-a1-${idx + 1}"><name>${safeFileName}</name><duration>${dur}</duration><rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate><start>${startTimeline}</start><end>${endTimeline}</end><in>${inFrame}</in><out>${outFrame}</out>${fileBlock}<sourcetrack><mediatype>audio</mediatype><trackindex>1</trackindex></sourcetrack></clipitem>`;
             });
 
             return `<?xml version="1.0" encoding="UTF-8"?>
@@ -1029,28 +933,8 @@
         <duration>${currentTimelineFrame}</duration>
         <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
         <media>
-            <video>
-                <format>
-                    <samplecharacteristics>
-                        <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
-                        <width>1920</width>
-                        <height>1080</height>
-                        <anamorphic>FALSE</anamorphic>
-                        <pixelaspectratio>square</pixelaspectratio>
-                        <fielddominance>none</fielddominance>
-                    </samplecharacteristics>
-                </format>
-                <track>${videoTrackXml}</track>
-            </video>
-            <audio>
-                <format>
-                    <samplecharacteristics>
-                        <depth>16</depth>
-                        <samplerate>48000</samplerate>
-                    </samplecharacteristics>
-                </format>
-                <track>${audioTrack1Xml}</track>
-            </audio>
+            <video><track>${videoTrackXml}</track></video>
+            <audio><track>${audioTrack1Xml}</track></audio>
         </media>
     </sequence>
 </xmeml>`;
