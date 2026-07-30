@@ -6,6 +6,10 @@
     <title>AutoCut Pro - Cosmic Space Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Supabase SDK Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -101,10 +105,31 @@
                     <p class="text-[10px] text-slate-400">AI-Powered Silence Cutter & Highlight Finder</p>
                 </div>
             </div>
+
+            <!-- Auth Section (Google Sign-In / User Profile) -->
             <div class="flex items-center gap-3">
-                <span class="text-xs px-3 py-1 rounded-full bg-slate-900/90 text-cyan-400 border border-cyan-500/30 font-mono flex items-center gap-1.5 shadow-inner">
-                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Groq Llama-3.3-70B
-                </span>
+                <!-- Logged Out State: Google Sign-In Button -->
+                <button id="google-login-btn" onclick="loginWithGoogle()" class="flex items-center gap-2.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-indigo-500/30 hover:border-cyan-400/60 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 shadow-lg hover:shadow-cyan-500/10 active:scale-95">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.15C3.26 21.3 7.31 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.39l3.99-3.15z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.61l3.99 3.15c.95-2.85 3.6-4.96 6.72-4.96z"/>
+                    </svg>
+                    <span>Sign in with Google</span>
+                </button>
+
+                <!-- Logged In State: User Info & Logout (Hidden by default) -->
+                <div id="user-profile" class="hidden flex items-center gap-3 bg-slate-900/90 border border-indigo-500/30 px-3 py-1.5 rounded-xl shadow-lg">
+                    <img id="user-avatar" src="" alt="Avatar text-slate-400" class="w-7 h-7 rounded-full border border-cyan-400">
+                    <div class="text-left hidden sm:block">
+                        <div id="user-name" class="text-xs font-bold text-cyan-300">User Name</div>
+                        <div id="user-email" class="text-[9px] font-mono text-slate-400">user@email.com</div>
+                    </div>
+                    <button onclick="logout()" class="text-[10px] font-mono text-rose-400 hover:text-rose-300 bg-rose-950/50 hover:bg-rose-900/80 px-2.5 py-1 rounded-lg border border-rose-500/30 transition">
+                        LOGOUT
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -336,6 +361,65 @@
     </main>
 
     <script>
+        // Supabase Initialization
+        const SUPABASE_URL = 'https://gfjwpkuutrriavympmez.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_nW5HkRj0maBmBP1Kj-pmsQ_TAQDavKD';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // --- GOOGLE AUTH FUNCTIONS ---
+        async function loginWithGoogle() {
+            try {
+                const { error } = await _supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin + window.location.pathname
+                    }
+                });
+                if (error) throw error;
+            } catch (err) {
+                alert("เกิดข้อผิดพลาดในการล็อกอิน: " + err.message);
+            }
+        }
+
+        async function logout() {
+            try {
+                const { error } = await _supabase.auth.signOut();
+                if (error) throw error;
+            } catch (err) {
+                alert("เกิดข้อผิดพลาดในการออกจากระบบ: " + err.message);
+            }
+        }
+
+        // Auth State Listener (อัปเดต UI เมื่อมีการเข้าสู่ระบบ/ออกจากระบบ)
+        _supabase.auth.onAuthStateChange((event, session) => {
+            updateAuthUI(session);
+        });
+
+        function updateAuthUI(session) {
+            const googleBtn = document.getElementById('google-login-btn');
+            const userProfile = document.getElementById('user-profile');
+            
+            if (session && session.user) {
+                const user = session.user;
+                document.getElementById('user-name').innerText = user.user_metadata.full_name || 'User';
+                document.getElementById('user-email').innerText = user.email || '';
+                document.getElementById('user-avatar').src = user.user_metadata.avatar_url || 'https://via.placeholder.com/150';
+
+                googleBtn.classList.add('hidden');
+                userProfile.classList.remove('hidden');
+            } else {
+                googleBtn.classList.remove('hidden');
+                userProfile.classList.add('hidden');
+            }
+        }
+
+        // ตรวจสอบ Session เมื่อเปิดหน้าเว็บขึ้นมา
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await _supabase.auth.getSession();
+            updateAuthUI(session);
+        });
+
+        // --- APP CONTROLS & AUDIO PROCESSING ---
         const PRESETS = {
             calm: { removeSilenceMs: 400, keepTalksMs: 200, marginBeforeMs: 150, marginAfterMs: 150, minCutMs: 1200 },
             measured: { removeSilenceMs: 300, keepTalksMs: 150, marginBeforeMs: 100, marginAfterMs: 100, minCutMs: 1000 },
@@ -655,7 +739,7 @@
             return merged;
         }
 
-        // Draw Cosmic Space Waveform Visualizer Canvas
+        // Draw Waveform Canvas
         function renderWaveform() {
             if (!audioBuffer) return;
 
@@ -670,15 +754,12 @@
             const totalDuration = audioBuffer.duration;
             const thresholdDb = parseFloat(thresholdInput.value);
 
-            // Background Deep Void
             ctx.fillStyle = '#030712';
             ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-            // Silences Region (Cosmic Crimson)
             ctx.fillStyle = 'rgba(225, 29, 72, 0.35)';
             ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
-            // Talk Regions
             activeClips.forEach(clip => {
                 const xStart = (clip.start / totalDuration) * canvasWidth;
                 const xEnd = (clip.end / totalDuration) * canvasWidth;
@@ -690,7 +771,6 @@
                 ctx.fillRect(xStart, 0, xEnd - xStart, canvasHeight);
             });
 
-            // dB Gridlines
             const dbLevels = [0, -20, -40, -60];
             ctx.strokeStyle = 'rgba(99, 102, 241, 0.15)';
             ctx.fillStyle = '#64748b';
@@ -705,7 +785,6 @@
                 ctx.fillText(`${db}dB`, 8, y - 3);
             });
 
-            // Time Rulers
             const timeInterval = Math.max(2, Math.floor(15 / currentZoom)); 
             ctx.strokeStyle = 'rgba(148, 163, 184, 0.2)';
             ctx.fillStyle = '#94a3b8';
@@ -720,7 +799,6 @@
                 ctx.fillText(formatTimecode(t), x + 4, 12);
             }
 
-            // Real Audio Waveform Bars
             ctx.fillStyle = 'rgba(244, 244, 245, 0.95)';
             const numPeaks = downsampledPeaks.length;
             const barWidth = canvasWidth / numPeaks;
@@ -734,7 +812,6 @@
                 ctx.fillRect(i * barWidth, canvasHeight - height, Math.max(1, barWidth - 0.5), height);
             }
 
-            // Noise Threshold Line (Neon Magenta)
             const threshY = dbToY(thresholdDb, canvasHeight);
             ctx.strokeStyle = '#d946ef';
             ctx.lineWidth = 2;
@@ -746,7 +823,6 @@
             ctx.stroke();
             ctx.shadowBlur = 0;
 
-            // Playhead Line Indicator (Neon Cyan)
             if (videoPlayer.duration) {
                 const playheadX = (videoPlayer.currentTime / totalDuration) * canvasWidth;
                 
@@ -875,7 +951,6 @@
             });
         }
 
-        // Single Track XML (V1 + A1)
         function generateXML(fileName, clips, userFolderPath) {
             const fps = 60;
             const timebase = 60;
@@ -924,7 +999,6 @@
                             </media>
                         </file>`;
 
-                // Video Track (V1)
                 videoTrackXml += `
                 <clipitem id="clipitem-v-${idx + 1}">
                     <name>${safeFileName}</name>
@@ -935,7 +1009,6 @@
                     ${fileBlock}
                 </clipitem>`;
 
-                // Audio Track 1 (A1)
                 audioTrack1Xml += `
                 <clipitem id="clipitem-a1-${idx + 1}">
                     <name>${safeFileName}</name>
