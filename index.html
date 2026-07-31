@@ -1,1 +1,1334 @@
+<!DOCTYPE html>
+<html lang="th">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoCut Pro - Cosmic Space Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Supabase SDK Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #030712;
+            background-image:
+                radial-gradient(at 10% 10%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 20%, rgba(217, 70, 239, 0.12) 0px, transparent 50%),
+                radial-gradient(at 50% 80%, rgba(6, 182, 212, 0.12) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(99, 102, 241, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-panel-interactive {
+            transition: all 0.3s ease;
+        }
+
+        .glass-panel-interactive:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.15);
+        }
+
+        .preset-btn.active {
+            background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%);
+            color: #ffffff;
+            border-color: rgba(192, 132, 252, 0.8);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
+        }
+
+        .speed-btn.active {
+            background: #06b6d4;
+            color: #030712;
+            font-weight: 700;
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
+        }
+
+        .waveform-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .waveform-scroll::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .waveform-scroll::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 9999px;
+        }
+
+        .waveform-scroll::-webkit-scrollbar-thumb:hover {
+            background: #a855f7;
+        }
+
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+        }
+
+        input[type=range] {
+            accent-color: #a855f7;
+        }
+    </style>
+</head>
+
+<body class="text-slate-100 min-h-screen pb-12 select-none relative overflow-x-hidden">
+
+    <!-- Ambient Stars -->
+    <div class="fixed inset-0 pointer-events-none z-0">
+        <div class="absolute top-1/4 left-1/3 w-1 h-1 bg-white rounded-full animate-ping opacity-75"></div>
+        <div class="absolute top-2/3 right-1/4 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse opacity-60"></div>
+    </div>
+
+    <!-- Header -->
+    <header
+        class="border-b border-indigo-500/20 bg-slate-950/70 backdrop-blur-xl sticky top-0 z-50 py-4 px-6 shadow-2xl">
+        <div class="max-w-[1600px] mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-fuchsia-500 flex items-center justify-center shadow-lg glow-purple font-mono font-bold text-xs text-white">
+                    AC
+                </div>
+                <div>
+                    <h1
+                        class="text-lg font-extrabold tracking-wider bg-gradient-to-r from-cyan-400 via-fuchsia-300 to-indigo-300 bg-clip-text text-transparent">
+                        AUTOCUT PRO <span id="plan-badge"
+                            class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-600 uppercase tracking-widest ml-1">GUEST
+                            (Max 3m)</span>
+                    </h1>
+                    <p class="text-[10px] text-slate-400">AI-Powered Silence Cutter & Highlight Finder</p>
+                </div>
+            </div>
+
+            <!-- Auth & Action Section -->
+            <div class="flex items-center gap-3">
+                <!-- Upgrade Pro Button -->
+                <button id="upgrade-btn" onclick="handleUpgrade()"
+                    class="flex items-center gap-1.5 bg-gradient-to-r from-amber-500 via-fuchsia-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all duration-300 shadow-lg hover:shadow-amber-500/25 active:scale-95 border border-amber-300/40">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span>Upgrade PRO</span>
+                </button>
+
+                <!-- Logged Out State -->
+                <button id="google-login-btn" onclick="loginWithGoogle()"
+                    class="flex items-center gap-2.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-indigo-500/30 hover:border-cyan-400/60 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 shadow-lg hover:shadow-cyan-500/10 active:scale-95">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path fill="#4285F4"
+                            d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" />
+                        <path fill="#34A853"
+                            d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.15C3.26 21.3 7.31 24 12 24z" />
+                        <path fill="#FBBC05"
+                            d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.39l3.99-3.15z" />
+                        <path fill="#EA4335"
+                            d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.61l3.99 3.15c.95-2.85 3.6-4.96 6.72-4.96z" />
+                    </svg>
+                    <span>Sign in with Google</span>
+                </button>
+
+                <!-- Logged In State -->
+                <div id="user-profile"
+                    class="hidden flex items-center gap-3 bg-slate-900/90 border border-indigo-500/30 px-3 py-1.5 rounded-xl shadow-lg">
+                    <img id="user-avatar" src="" alt="Avatar" class="w-7 h-7 rounded-full border border-cyan-400">
+                    <div class="text-left hidden sm:block">
+                        <div id="user-name" class="text-xs font-bold text-cyan-300">User Name</div>
+                        <div id="user-email" class="text-[9px] font-mono text-slate-400">user@email.com</div>
+                    </div>
+                    <button onclick="logout()"
+                        class="text-[10px] font-mono text-rose-400 hover:text-rose-300 bg-rose-950/50 hover:bg-rose-900/80 px-2.5 py-1 rounded-lg border border-rose-500/30 transition">
+                        LOGOUT
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+
+        <!-- Left Column: Big Video Preview Monitor & Waveform Visualizer -->
+        <div class="lg:col-span-8 space-y-6">
+
+            <!-- Video Player Preview Panel (MAXIMIZED DISPLAY) -->
+            <div class="glass-panel rounded-2xl p-4 md:p-6 space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                        VIDEO PREVIEW STUDIO
+                    </span>
+                </div>
+                <div
+                    class="relative w-full aspect-video bg-slate-950 rounded-xl overflow-hidden border border-indigo-500/30 flex items-center justify-center shadow-2xl min-h-[380px] md:min-h-[480px]">
+                    <video id="video-player" class="w-full h-full object-contain hidden" controls></video>
+                    <div id="video-placeholder" class="text-slate-500 text-center p-6 space-y-3">
+                        <svg class="w-16 h-16 mx-auto text-indigo-500/40 animate-pulse" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        <p class="text-sm font-bold text-slate-300">หน้าจอเล่นวิดีโอพรีวิว</p>
+                        <p class="text-xs text-slate-500">
+                            เลือกหรือลากไฟล์วิดีโอมาวางที่แถบเครื่องมือทางขวาเพื่อเริ่มแสดงผล</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Waveform Studio -->
+            <div class="glass-panel rounded-2xl p-5 space-y-4 relative overflow-hidden shadow-2xl">
+                <div class="flex justify-between items-center px-1">
+                    <span class="text-xs font-bold text-slate-200 flex items-center gap-2 tracking-wide">
+                        AutoCut Silence Visualizer
+                    </span>
+                    <span id="cut-summary"
+                        class="text-xs font-mono text-rose-300 font-bold bg-rose-950/60 px-3 py-1 rounded-full border border-rose-500/30 shadow-lg">
+                        ตัดออก 0s (0%)
+                    </span>
+                </div>
+
+                <!-- Display Canvas -->
+                <div
+                    class="relative bg-slate-950/90 border border-indigo-500/20 rounded-xl overflow-hidden shadow-inner group">
+                    <div id="waveform-viewport"
+                        class="waveform-scroll overflow-x-auto overflow-y-hidden relative h-64 w-full cursor-pointer">
+                        <canvas id="waveform-canvas" class="block h-full"></canvas>
+                    </div>
+
+                    <div
+                        class="absolute bottom-3 left-3 right-3 flex justify-between items-center pointer-events-none z-10">
+                        <div
+                            class="flex items-center gap-2 bg-slate-950/90 backdrop-blur-md border border-indigo-500/30 rounded-xl p-1.5 pointer-events-auto shadow-2xl">
+                            <button id="play-pause-btn"
+                                class="px-2.5 py-1 hover:bg-indigo-900/50 rounded-lg text-xs font-mono font-bold text-slate-200 transition">
+                                PLAY
+                            </button>
+                            <div class="h-4 w-[1px] bg-indigo-500/30"></div>
+                            <div class="flex gap-1 text-[10px] font-mono">
+                                <button class="speed-btn active px-2 py-0.5 rounded-md text-slate-300 transition"
+                                    data-speed="1">x1</button>
+                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition"
+                                    data-speed="1.2">x1.2</button>
+                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition"
+                                    data-speed="1.5">x1.5</button>
+                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition"
+                                    data-speed="1.7">x1.7</button>
+                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition"
+                                    data-speed="2">x2</button>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center gap-2 bg-slate-950/90 backdrop-blur-md border border-indigo-500/30 rounded-xl px-3 py-1.5 pointer-events-auto shadow-2xl">
+                            <span class="text-[10px] font-mono uppercase text-slate-400">Zoom</span>
+                            <button id="zoom-out-btn"
+                                class="text-xs text-slate-400 hover:text-cyan-400 px-1 font-bold">-</button>
+                            <input type="range" id="zoom-slider" min="1" max="10" step="0.1" value="1"
+                                class="w-24 accent-fuchsia-500 h-1 bg-slate-800 rounded cursor-pointer">
+                            <button id="zoom-in-btn"
+                                class="text-xs text-slate-400 hover:text-cyan-400 px-1 font-bold">+</button>
+                            <span id="zoom-val"
+                                class="text-[10px] font-mono text-fuchsia-400 font-bold w-6 text-right">1x</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="flex justify-center items-center gap-6 text-[11px] font-mono text-slate-400 py-1 border-t border-indigo-500/10">
+                    <span class="flex items-center gap-1.5"><span
+                            class="w-3 h-3 rounded-full bg-cyan-500/80 inline-block shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
+                        Margins</span>
+                    <span class="flex items-center gap-1.5"><span
+                            class="w-3 h-3 rounded-full bg-rose-600/80 inline-block shadow-[0_0_8px_rgba(225,29,72,0.8)]"></span>
+                        Silences</span>
+                    <span class="flex items-center gap-1.5"><span
+                            class="w-4 h-[2px] bg-fuchsia-500 inline-block"></span> Noise Threshold</span>
+                </div>
+
+                <div class="relative h-12 bg-slate-950 border border-indigo-500/20 rounded-xl overflow-hidden cursor-grab active:cursor-grabbing shadow-inner"
+                    id="minimap-container">
+                    <canvas id="minimap-canvas" class="w-full h-full block"></canvas>
+                    <div id="minimap-viewport-box"
+                        class="absolute top-0 bottom-0 border-2 border-fuchsia-500 bg-fuchsia-500/20 rounded-lg pointer-events-none">
+                    </div>
+                    <div class="absolute bottom-1 left-2 text-[9px] font-mono text-slate-500 pointer-events-none"
+                        id="time-start-label">00:00</div>
+                    <div class="absolute bottom-1 right-2 text-[9px] font-mono text-slate-500 pointer-events-none"
+                        id="time-end-label">00:00</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: ALL TOOLBARS & CONTROLS -->
+        <div class="lg:col-span-4 space-y-6">
+
+            <!-- Folder Path Input Panel -->
+            <div class="glass-panel glass-panel-interactive rounded-2xl p-5 space-y-2">
+                <label class="text-xs font-bold text-cyan-400 uppercase tracking-widest block flex items-center gap-2">
+                    1. กำหนด FOLDER PATH ของวิดีโอ (ป้องกัน MEDIA OFFLINE)
+                </label>
+                <div class="relative">
+                    <input type="text" id="folder-path-input" placeholder="เช่น C:\from OBS หรือ D:\Projects\Game"
+                        class="w-full bg-slate-950/80 border border-indigo-500/30 rounded-xl px-4 py-3 text-xs text-cyan-200 font-mono focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition placeholder:text-slate-600 shadow-inner">
+                </div>
+            </div>
+
+            <!-- Upload Zone -->
+            <div class="glass-panel rounded-2xl p-5 space-y-3">
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block">2.
+                    เลือกไฟล์วิดีโอ</label>
+                <div id="drop-zone"
+                    class="border-2 border-dashed border-indigo-500/30 hover:border-cyan-400 bg-slate-950/40 rounded-xl p-6 text-center cursor-pointer transition-all duration-300 group">
+                    <input type="file" id="video-input" accept="video/*" class="hidden">
+                    <div class="space-y-2 pointer-events-none">
+                        <div
+                            class="w-10 h-10 rounded-full bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center mx-auto text-cyan-400 font-mono font-bold text-lg group-hover:scale-110 transition-all duration-300">
+                            +
+                        </div>
+                        <p class="text-xs font-semibold text-slate-200">วางไฟล์วิดีโอที่นี่ หรือคลิกเพื่อเลือกไฟล์</p>
+                        <p id="path-preview"
+                            class="text-[10px] font-mono text-fuchsia-400 truncate max-w-xs mx-auto hidden"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings & Presets -->
+            <div class="glass-panel rounded-2xl p-6 space-y-6">
+                <div>
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-3">Presets</label>
+                    <div class="flex flex-wrap gap-2.5" id="presets-container">
+                        <button
+                            class="preset-btn px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300"
+                            data-preset="calm">Calm</button>
+                        <button
+                            class="preset-btn px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300"
+                            data-preset="measured">Measured</button>
+                        <button
+                            class="preset-btn active px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300"
+                            data-preset="paced">Paced</button>
+                        <button
+                            class="preset-btn px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300"
+                            data-preset="energetic">Energetic</button>
+                        <button
+                            class="preset-btn px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300"
+                            data-preset="jumpy">Jumpy</button>
+                    </div>
+                </div>
+
+                <hr class="border-indigo-500/10">
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1.5">Remove Silences Longer Than</label>
+                        <div class="relative">
+                            <input type="number" id="remove-silence-ms" value="200"
+                                class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
+                            <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1.5">Margin Before By</label>
+                        <div class="relative">
+                            <input type="number" id="margin-before-ms" value="50"
+                                class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
+                            <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-xs text-slate-400">Minimum Time Between Cuts</label>
+                            <input type="checkbox" id="enable-min-cut" checked
+                                class="accent-fuchsia-500 cursor-pointer">
+                        </div>
+                        <div class="relative">
+                            <input type="number" id="min-cut-ms" value="800"
+                                class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
+                            <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1.5">Keep Talks Longer Than</label>
+                        <div class="relative">
+                            <input type="number" id="keep-talks-ms" value="100"
+                                class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
+                            <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-400 block mb-1.5">Margin After By</label>
+                        <div class="relative">
+                            <input type="number" id="margin-after-ms" value="50"
+                                class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
+                            <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1.5">
+                            <label class="text-xs text-fuchsia-400 font-semibold">Silence Threshold</label>
+                            <span id="thresh-val" class="text-xs font-mono text-fuchsia-400 font-bold">-35dB</span>
+                        </div>
+                        <input type="range" id="threshold-db" min="-60" max="-15" value="-35"
+                            class="w-full bg-slate-800 cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clips List & Export -->
+            <div class="glass-panel rounded-2xl p-5 space-y-4">
+                <h2
+                    class="text-sm font-bold text-slate-200 flex justify-between items-center border-b border-indigo-500/20 pb-3">
+                    <span>รายการคลิปที่ถูกตัด</span>
+                    <span id="clip-count"
+                        class="text-xs font-mono text-cyan-300 bg-cyan-950/80 px-3 py-1 rounded-full border border-cyan-500/30">0
+                        Clips</span>
+                </h2>
+
+                <div id="clips-list"
+                    class="max-h-[380px] overflow-y-auto space-y-2 pr-1 text-xs text-slate-300 font-mono">
+                    <p class="text-slate-600 text-center py-10">ลากไฟล์วิดีโอเพื่อเริ่มสแกนคลื่นเสียง</p>
+                </div>
+
+                <div id="export-group" class="hidden pt-3 border-t border-indigo-500/20 space-y-2.5">
+                    <button id="export-mp4-btn"
+                        class="w-full py-3 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg hover:opacity-90 transition flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M7 10l5 5 5-5M12 15V3" />
+                        </svg>
+                        <span id="export-mp4-btn-label">Export วิดีโอ (.MP4)</span>
+                    </button>
+                </div>
+
+                <!-- Groq AI -->
+                <div class="glass-panel rounded-2xl p-5 space-y-4">
+                    <h2 class="text-sm font-bold text-slate-200 border-b border-indigo-500/20 pb-3">Groq AI Highlight
+                        Finder
+                    </h2>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5">Groq API Key</label>
+                        <input type="password" id="api-key" placeholder="วาง API Key จาก console.groq.com"
+                            class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 font-mono">
+                    </div>
+                    <button id="ai-analyze-btn" disabled
+                        class="w-full py-3 bg-gradient-to-r from-cyan-500 to-indigo-600 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-600 text-white font-bold text-xs rounded-xl shadow-lg transition">
+                        วิเคราะห์หาช็อตเด็ดด้วย Groq AI
+                    </button>
+                    <div id="ai-result-box"
+                        class="hidden mt-2 p-4 bg-slate-950/90 border border-indigo-500/30 rounded-xl text-xs text-slate-300 leading-relaxed max-h-52 overflow-y-auto">
+                        <strong class="text-cyan-400 block mb-1.5">คำแนะนำจาก Groq AI:</strong>
+                        <div id="ai-result-text">กำลังประมวลผล...</div>
+                    </div>
+                </div>
+
+            </div>
+    </main>
+
+    <!-- FFmpeg.wasm (loaded as an ES module, exposed on window for the main script to use) -->
+    <script type="module">
+        import { FFmpeg } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
+        import { fetchFile, toBlobURL } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js';
+        window.__FFmpegLib = { FFmpeg, fetchFile, toBlobURL };
+        window.dispatchEvent(new Event('ffmpeg-lib-ready'));
+    </script>
+
+    <script>
+        const SUPABASE_URL = 'https://gfjwpkuutrriavympmez.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_nW5HkRj0maBmBP1Kj-pmsQ_TAQDavKD';
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let currentUserPlan = 'guest'; // สถานะผู้ใช้ปัจจุบัน: 'guest', 'free', 'pro'
+
+        // --- UPGRADE CHECKOUT SYSTEM ---
+        async function handleUpgrade() {
+            // ดึง userId ของคนที่ล็อกอินอยู่จาก Supabase Client (_supabase)
+            const { data: { user } } = await _supabase.auth.getUser();
+
+            if (!user) {
+                alert('กรุณาล็อกอินด้วย Google ก่อนทำการอัปเกรดเป็น PRO ครับ');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${SUPABASE_URL}/functions/v1/checkout`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({ userId: user.id }),
+                });
+
+                const data = await res.json();
+
+                if (data.url) {
+                    // เปลี่ยนหน้าไปสแกน PromptPay / ชำระเงินบน Stripe
+                    window.location.href = data.url;
+                } else {
+                    alert('เกิดข้อผิดพลาด: ' + (data.error || 'ไม่สามารถสร้างลิงก์ชำระเงินได้'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('ไม่สามารถเชื่อมต่อระบบชำระเงินได้');
+            }
+        }
+
+        // --- SERVER-SIDE QUOTA CHECK ---
+        // เรียก Edge Function 'check-usage' เพื่อตรวจสอบสิทธิ์จริงจากฐานข้อมูล
+        // (ป้องกันการแก้ currentUserPlan ผ่าน Developer Console)
+        async function checkUsageOnServer(durationSec) {
+            try {
+                const { data: { session } } = await _supabase.auth.getSession();
+                const headers = { 'Content-Type': 'application/json' };
+                if (session?.access_token) {
+                    headers['Authorization'] = `Bearer ${session.access_token}`;
+                }
+
+                const res = await fetch(`${SUPABASE_URL}/functions/v1/check-usage`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ durationSec }),
+                });
+
+                if (!res.ok) {
+                    // ถ้าเซิร์ฟเวอร์ล่มชั่วคราว ให้ fallback เป็น deny เพื่อความปลอดภัย (fail-closed)
+                    return { allowed: false, message: 'ไม่สามารถตรวจสอบสิทธิ์ได้ในขณะนี้ กรุณาลองใหม่อีกครั้งครับ' };
+                }
+
+                return await res.json();
+            } catch (err) {
+                console.error('checkUsageOnServer error:', err);
+                return { allowed: false, message: 'ไม่สามารถเชื่อมต่อระบบตรวจสอบสิทธิ์ได้' };
+            }
+        }
+
+        // --- AUTH & PLAN SYSTEM ---
+        async function loginWithGoogle() {
+            try {
+                const { error } = await _supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: window.location.origin + window.location.pathname }
+                });
+                if (error) throw error;
+            } catch (err) { alert("เกิดข้อผิดพลาดในการล็อกอิน: " + err.message); }
+        }
+
+        async function logout() {
+            try {
+                const { error } = await _supabase.auth.signOut();
+                if (error) throw error;
+            } catch (err) { alert("เกิดข้อผิดพลาดในการออกจากระบบ: " + err.message); }
+        }
+
+        _supabase.auth.onAuthStateChange(async (event, session) => {
+            await updateAuthAndPlanUI(session);
+        });
+
+        async function updateAuthAndPlanUI(session) {
+            const googleBtn = document.getElementById('google-login-btn');
+            const userProfile = document.getElementById('user-profile');
+            const planBadge = document.getElementById('plan-badge');
+            const upgradeBtn = document.getElementById('upgrade-btn');
+
+            if (session && session.user) {
+                const user = session.user;
+                document.getElementById('user-name').innerText = user.user_metadata.full_name || 'User';
+                document.getElementById('user-email').innerText = user.email || '';
+                document.getElementById('user-avatar').src = user.user_metadata.avatar_url || 'https://via.placeholder.com/150';
+
+                googleBtn.classList.add('hidden');
+                userProfile.classList.remove('hidden');
+
+                // ดึงข้อมูลสถานะ Plan จาก Supabase Database Table 'profiles'
+                try {
+                    const { data, error } = await _supabase
+                        .from('profiles')
+                        .select('plan_type')
+                        .eq('id', user.id)
+                        .single();
+
+                    if (data && data.plan_type) {
+                        currentUserPlan = data.plan_type;
+                    } else {
+                        currentUserPlan = 'free';
+                    }
+                } catch (e) {
+                    currentUserPlan = 'free';
+                }
+
+                if (currentUserPlan === 'pro') {
+                    planBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-fuchsia-500 text-white font-bold border border-amber-300 uppercase tracking-widest ml-1 shadow-lg";
+                    planBadge.innerText = "PRO MEMBER (Unlimited)";
+                    if (upgradeBtn) upgradeBtn.classList.add('hidden'); // ซ่อนปุ่ม Upgrade ถ้าเป็น Pro แล้ว
+                } else {
+                    planBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40 uppercase tracking-widest ml-1";
+                    planBadge.innerText = "FREE PLAN (Max 10m)";
+                    if (upgradeBtn) upgradeBtn.classList.remove('hidden');
+                }
+
+            } else {
+                currentUserPlan = 'guest';
+                googleBtn.classList.remove('hidden');
+                userProfile.classList.add('hidden');
+                planBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-600 uppercase tracking-widest ml-1";
+                planBadge.innerText = "GUEST (Max 3m)";
+                if (upgradeBtn) upgradeBtn.classList.remove('hidden');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await _supabase.auth.getSession();
+            await updateAuthAndPlanUI(session);
+        });
+
+        // --- APP CONTROLS & AUDIO PROCESSING ---
+        const PRESETS = {
+            calm: { removeSilenceMs: 400, keepTalksMs: 200, marginBeforeMs: 150, marginAfterMs: 150, minCutMs: 1200 },
+            measured: { removeSilenceMs: 300, keepTalksMs: 150, marginBeforeMs: 100, marginAfterMs: 100, minCutMs: 1000 },
+            paced: { removeSilenceMs: 200, keepTalksMs: 100, marginBeforeMs: 50, marginAfterMs: 50, minCutMs: 800 },
+            energetic: { removeSilenceMs: 120, keepTalksMs: 80, marginBeforeMs: 30, marginAfterMs: 30, minCutMs: 500 },
+            jumpy: { removeSilenceMs: 80, keepTalksMs: 50, marginBeforeMs: 10, marginAfterMs: 10, minCutMs: 300 }
+        };
+
+        const dropZone = document.getElementById('drop-zone');
+        const videoInput = document.getElementById('video-input');
+        const videoPlayer = document.getElementById('video-player');
+        const videoPlaceholder = document.getElementById('video-placeholder');
+        const thresholdInput = document.getElementById('threshold-db');
+        const threshVal = document.getElementById('thresh-val');
+        const folderPathInput = document.getElementById('folder-path-input');
+        const pathPreview = document.getElementById('path-preview');
+
+        const removeSilenceMs = document.getElementById('remove-silence-ms');
+        const keepTalksMs = document.getElementById('keep-talks-ms');
+        const marginBeforeMs = document.getElementById('margin-before-ms');
+        const marginAfterMs = document.getElementById('margin-after-ms');
+        const minCutMs = document.getElementById('min-cut-ms');
+        const enableMinCut = document.getElementById('enable-min-cut');
+
+        const waveformViewport = document.getElementById('waveform-viewport');
+        const waveformCanvas = document.getElementById('waveform-canvas');
+        const minimapCanvas = document.getElementById('minimap-canvas');
+        const minimapContainer = document.getElementById('minimap-container');
+        const minimapViewportBox = document.getElementById('minimap-viewport-box');
+        const zoomSlider = document.getElementById('zoom-slider');
+        const zoomVal = document.getElementById('zoom-val');
+        const zoomInBtn = document.getElementById('zoom-in-btn');
+        const zoomOutBtn = document.getElementById('zoom-out-btn');
+        const playPauseBtn = document.getElementById('play-pause-btn');
+
+        let audioBuffer = null;
+        let downsampledPeaks = [];
+        let activeClips = [];
+        let loadedFileName = "video.mp4";
+        let loadedFile = null; // เก็บ File object ต้นฉบับไว้ใช้ตอน export MP4 จริง
+        let isProcessing = false;
+        let currentZoom = 1;
+        let isDraggingMinimap = false;
+
+        thresholdInput.addEventListener('input', (e) => {
+            threshVal.innerText = `${e.target.value}dB`;
+            recalculateAndRender();
+        });
+
+        [removeSilenceMs, keepTalksMs, marginBeforeMs, marginAfterMs, minCutMs, enableMinCut].forEach(el => {
+            el.addEventListener('input', recalculateAndRender);
+            el.addEventListener('change', recalculateAndRender);
+        });
+
+        document.querySelectorAll('.preset-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                const config = PRESETS[e.target.getAttribute('data-preset')];
+                if (config) {
+                    removeSilenceMs.value = config.removeSilenceMs;
+                    keepTalksMs.value = config.keepTalksMs;
+                    marginBeforeMs.value = config.marginBeforeMs;
+                    marginAfterMs.value = config.marginAfterMs;
+                    minCutMs.value = config.minCutMs;
+                    recalculateAndRender();
+                }
+            });
+        });
+
+        zoomSlider.addEventListener('input', (e) => {
+            currentZoom = parseFloat(e.target.value);
+            zoomVal.innerText = `${currentZoom.toFixed(1)}x`;
+            renderWaveform();
+        });
+
+        zoomInBtn.addEventListener('click', () => {
+            zoomSlider.value = Math.min(10, parseFloat(zoomSlider.value) + 0.5);
+            zoomSlider.dispatchEvent(new Event('input'));
+        });
+
+        zoomOutBtn.addEventListener('click', () => {
+            zoomSlider.value = Math.max(1, parseFloat(zoomSlider.value) - 0.5);
+            zoomSlider.dispatchEvent(new Event('input'));
+        });
+
+        waveformViewport.addEventListener('scroll', updateMinimapViewport);
+
+        waveformCanvas.addEventListener('click', (e) => {
+            if (!audioBuffer) return;
+            const rect = waveformCanvas.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const totalDuration = audioBuffer.duration;
+            const targetTime = (clickX / waveformCanvas.width) * totalDuration;
+            videoPlayer.currentTime = Math.max(0, Math.min(totalDuration, targetTime));
+            renderWaveform();
+        });
+
+        function handleMinimapDrag(e) {
+            if (!audioBuffer) return;
+            const rect = minimapContainer.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const percent = Math.max(0, Math.min(1, clickX / rect.width));
+            const totalWidth = waveformCanvas.width;
+            const viewportWidth = waveformViewport.clientWidth;
+            const targetScrollLeft = (percent * totalWidth) - (viewportWidth / 2);
+            waveformViewport.scrollLeft = Math.max(0, Math.min(totalWidth - viewportWidth, targetScrollLeft));
+        }
+
+        minimapContainer.addEventListener('mousedown', (e) => { isDraggingMinimap = true; handleMinimapDrag(e); });
+        window.addEventListener('mousemove', (e) => { if (isDraggingMinimap) handleMinimapDrag(e); });
+        window.addEventListener('mouseup', () => { isDraggingMinimap = false; });
+
+        videoPlayer.addEventListener('timeupdate', renderWaveform);
+        videoPlayer.addEventListener('play', () => { playPauseBtn.innerText = 'PAUSE'; animPlayheadLoop(); });
+        videoPlayer.addEventListener('pause', () => playPauseBtn.innerText = 'PLAY');
+
+        function animPlayheadLoop() {
+            if (!videoPlayer.paused && !videoPlayer.ended) {
+                renderWaveform();
+                requestAnimationFrame(animPlayheadLoop);
+            }
+        }
+
+        document.querySelectorAll('.speed-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                videoPlayer.playbackRate = parseFloat(e.target.getAttribute('data-speed'));
+            });
+        });
+
+        playPauseBtn.addEventListener('click', () => {
+            if (videoPlayer.paused) videoPlayer.play();
+            else videoPlayer.pause();
+        });
+
+        dropZone.addEventListener('click', () => videoInput.click());
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
+            dropZone.addEventListener(evt, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            if (e.dataTransfer.files.length > 0) handleVideoFile(e.dataTransfer.files[0]);
+        });
+
+        videoInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) handleVideoFile(e.target.files[0]);
+        });
+
+        function extractAndSetFolderPath(file) {
+            if (file && file.path) {
+                const fullPath = file.path;
+                const lastSlash = Math.max(fullPath.lastIndexOf('\\'), fullPath.lastIndexOf('/'));
+                if (lastSlash !== -1) folderPathInput.value = fullPath.substring(0, lastSlash);
+            }
+        }
+
+        async function handleVideoFile(file) {
+            loadedFileName = file.name;
+            loadedFile = file;
+            const tempVideo = document.createElement('video');
+            tempVideo.src = URL.createObjectURL(file);
+
+            tempVideo.onloadedmetadata = async () => {
+                const durationSec = tempVideo.duration;
+
+                // --- CHECK QUOTA & DURATION LIMIT (ตรวจกับเซิร์ฟเวอร์จริง กัน user แก้ค่าใน console) ---
+                const usageCheck = await checkUsageOnServer(durationSec);
+                if (!usageCheck.allowed) {
+                    alert("⚠️ " + usageCheck.message);
+                    return;
+                }
+
+                // หากผ่านเงื่อนไข ให้ประมวลผลต่อ
+                videoPlayer.src = tempVideo.src;
+                videoPlayer.classList.remove('hidden');
+                videoPlaceholder.classList.add('hidden');
+                pathPreview.innerText = file.name;
+                pathPreview.classList.remove('hidden');
+                extractAndSetFolderPath(file);
+
+                document.getElementById('clips-list').innerHTML = `<p class="text-cyan-400 text-center py-10 font-mono animate-pulse">กำลังสแกนความถี่คลื่นเสียง...</p>`;
+
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+                    document.getElementById('time-start-label').innerText = "00:00";
+                    document.getElementById('time-end-label').innerText = formatTimecode(audioBuffer.duration);
+
+                    generatePeaksData();
+                    recalculateAndRender();
+                } catch (err) {
+                    alert("อ่านไฟล์เสียงล้มเหลว: " + err.message);
+                }
+            };
+        }
+
+        function generatePeaksData() {
+            if (!audioBuffer) return;
+            const numChannels = audioBuffer.numberOfChannels;
+            const samplesPerPeak = Math.floor(audioBuffer.sampleRate * 0.01);
+            const numPeaks = Math.floor(audioBuffer.length / samplesPerPeak);
+            const channels = [];
+            for (let c = 0; c < numChannels; c++) channels.push(audioBuffer.getChannelData(c));
+
+            downsampledPeaks = new Float32Array(numPeaks);
+            for (let i = 0; i < numPeaks; i++) {
+                let sum = 0;
+                const start = i * samplesPerPeak;
+                for (let j = 0; j < samplesPerPeak; j++) {
+                    for (let c = 0; c < numChannels; c++) {
+                        const val = channels[c][start + j] || 0;
+                        sum += val * val;
+                    }
+                }
+                downsampledPeaks[i] = Math.sqrt(sum / (samplesPerPeak * numChannels));
+            }
+        }
+
+        function recalculateAndRender() {
+            if (!audioBuffer || isProcessing) return;
+            isProcessing = true;
+
+            requestAnimationFrame(() => {
+                const removeSilenceSec = parseFloat(removeSilenceMs.value) / 1000 || 0;
+                const keepTalksSec = parseFloat(keepTalksMs.value) / 1000 || 0;
+                const marginBeforeSec = parseFloat(marginBeforeMs.value) / 1000 || 0;
+                const marginAfterSec = parseFloat(marginAfterMs.value) / 1000 || 0;
+                const minCutSec = enableMinCut.checked ? (parseFloat(minCutMs.value) / 1000 || 0) : 0;
+                const thresholdDb = parseFloat(thresholdInput.value);
+
+                const totalDuration = audioBuffer.duration;
+                const thresholdAmp = Math.pow(10, thresholdDb / 20);
+
+                let isSpeech = false;
+                let speechStart = 0;
+                let rawClips = [];
+
+                const peakDuration = 0.01;
+                for (let i = 0; i < downsampledPeaks.length; i++) {
+                    const rms = downsampledPeaks[i];
+                    const currentTime = i * peakDuration;
+
+                    if (rms > thresholdAmp) {
+                        if (!isSpeech) {
+                            isSpeech = true;
+                            speechStart = Math.max(0, currentTime - marginBeforeSec);
+                        }
+                    } else {
+                        if (isSpeech) {
+                            const speechEnd = Math.min(totalDuration, currentTime + marginAfterSec);
+                            if (speechEnd - speechStart >= keepTalksSec) {
+                                rawClips.push({ start: speechStart, end: speechEnd });
+                            }
+                            isSpeech = false;
+                        }
+                    }
+                }
+                if (isSpeech) rawClips.push({ start: speechStart, end: totalDuration });
+
+                activeClips = mergeClipsAdvanced(rawClips, removeSilenceSec, minCutSec);
+
+                renderWaveform();
+                renderMinimap();
+                renderClipsList(activeClips, totalDuration);
+
+                document.getElementById('export-group').classList.remove('hidden');
+                document.getElementById('ai-analyze-btn').disabled = activeClips.length === 0;
+                document.getElementById('export-mp4-btn').disabled = activeClips.length === 0;
+
+                isProcessing = false;
+            });
+        }
+
+        function mergeClipsAdvanced(clips, removeSilenceSec, minCutSec) {
+            if (!clips.length) return [];
+            let merged = [clips[0]];
+
+            for (let i = 1; i < clips.length; i++) {
+                let prev = merged[merged.length - 1];
+                let curr = clips[i];
+                if ((curr.start - prev.end) < removeSilenceSec) prev.end = curr.end;
+                else merged.push(curr);
+            }
+
+            if (minCutSec > 0) merged = merged.filter(c => (c.end - c.start) >= minCutSec);
+            return merged;
+        }
+
+        function renderWaveform() {
+            if (!audioBuffer) return;
+
+            const ctx = waveformCanvas.getContext('2d');
+            const viewportWidth = waveformViewport.clientWidth;
+            const canvasWidth = viewportWidth * currentZoom;
+            const canvasHeight = waveformViewport.clientHeight;
+
+            waveformCanvas.width = canvasWidth;
+            waveformCanvas.height = canvasHeight;
+
+            const totalDuration = audioBuffer.duration;
+            const thresholdDb = parseFloat(thresholdInput.value);
+
+            ctx.fillStyle = '#030712';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            ctx.fillStyle = 'rgba(225, 29, 72, 0.35)';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+            activeClips.forEach(clip => {
+                const xStart = (clip.start / totalDuration) * canvasWidth;
+                const xEnd = (clip.end / totalDuration) * canvasWidth;
+                ctx.fillStyle = '#090d16';
+                ctx.fillRect(xStart, 0, xEnd - xStart, canvasHeight);
+                ctx.fillStyle = 'rgba(6, 182, 212, 0.2)';
+                ctx.fillRect(xStart, 0, xEnd - xStart, canvasHeight);
+            });
+
+            const dbLevels = [0, -20, -40, -60];
+            ctx.strokeStyle = 'rgba(99, 102, 241, 0.15)';
+            ctx.fillStyle = '#64748b';
+            ctx.font = '10px Plus Jakarta Sans, monospace';
+
+            dbLevels.forEach(db => {
+                const y = dbToY(db, canvasHeight);
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvasWidth, y);
+                ctx.stroke();
+                ctx.fillText(`${db}dB`, 8, y - 3);
+            });
+
+            const timeInterval = Math.max(2, Math.floor(15 / currentZoom));
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.2)';
+            ctx.fillStyle = '#94a3b8';
+
+            for (let t = 0; t < totalDuration; t += timeInterval) {
+                const x = (t / totalDuration) * canvasWidth;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, 15);
+                ctx.stroke();
+                ctx.fillText(formatTimecode(t), x + 4, 12);
+            }
+
+            ctx.fillStyle = 'rgba(244, 244, 245, 0.95)';
+            const numPeaks = downsampledPeaks.length;
+            const barWidth = canvasWidth / numPeaks;
+
+            for (let i = 0; i < numPeaks; i++) {
+                const rms = downsampledPeaks[i];
+                const db = rmsToDb(rms);
+                const y = dbToY(db, canvasHeight);
+                const height = canvasHeight - y;
+                ctx.fillRect(i * barWidth, canvasHeight - height, Math.max(1, barWidth - 0.5), height);
+            }
+
+            const threshY = dbToY(thresholdDb, canvasHeight);
+            ctx.strokeStyle = '#d946ef';
+            ctx.lineWidth = 2;
+            ctx.shadowColor = '#d946ef';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.moveTo(0, threshY);
+            ctx.lineTo(canvasWidth, threshY);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            if (videoPlayer.duration) {
+                const playheadX = (videoPlayer.currentTime / totalDuration) * canvasWidth;
+                ctx.strokeStyle = '#38bdf8';
+                ctx.lineWidth = 2.5;
+                ctx.shadowColor = '#38bdf8';
+                ctx.shadowBlur = 10;
+                ctx.beginPath();
+                ctx.moveTo(playheadX, 0);
+                ctx.lineTo(playheadX, canvasHeight);
+                ctx.stroke();
+
+                ctx.fillStyle = '#38bdf8';
+                ctx.beginPath();
+                ctx.moveTo(playheadX - 6, 0);
+                ctx.lineTo(playheadX + 6, 0);
+                ctx.lineTo(playheadX, 10);
+                ctx.closePath();
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+
+            updateMinimapViewport();
+        }
+
+        function renderMinimap() {
+            if (!audioBuffer) return;
+            const ctx = minimapCanvas.getContext('2d');
+            const w = minimapCanvas.width = minimapCanvas.clientWidth;
+            const h = minimapCanvas.height = minimapCanvas.clientHeight;
+
+            ctx.fillStyle = '#030712';
+            ctx.fillRect(0, 0, w, h);
+
+            ctx.fillStyle = '#6366f1';
+            const numPeaks = downsampledPeaks.length;
+            const barWidth = w / numPeaks;
+
+            for (let i = 0; i < numPeaks; i++) {
+                const rms = downsampledPeaks[i];
+                const db = rmsToDb(rms);
+                const y = dbToY(db, h);
+                const barH = h - y;
+                ctx.fillRect(i * barWidth, h - barH, Math.max(1, barWidth), barH);
+            }
+        }
+
+        function updateMinimapViewport() {
+            const viewportWidth = waveformViewport.clientWidth;
+            const scrollLeft = waveformViewport.scrollLeft;
+            const totalWidth = waveformCanvas.width;
+            if (totalWidth === 0) return;
+
+            const boxWidthPercent = (viewportWidth / totalWidth) * 100;
+            const boxLeftPercent = (scrollLeft / totalWidth) * 100;
+
+            minimapViewportBox.style.width = `${Math.min(100, boxWidthPercent)}%`;
+            minimapViewportBox.style.left = `${boxLeftPercent}%`;
+        }
+
+        function rmsToDb(rms) {
+            if (rms <= 0.00001) return -60;
+            return Math.max(-60, Math.min(0, 20 * Math.log10(rms)));
+        }
+
+        function dbToY(db, height) {
+            const norm = (Math.max(-60, Math.min(0, db)) - (-60)) / 60;
+            return height - (norm * (height - 25));
+        }
+
+        function formatTimecode(sec) {
+            const mins = Math.floor(sec / 60);
+            const secs = Math.floor(sec % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function renderClipsList(clips, totalDuration) {
+            const list = document.getElementById('clips-list');
+            const clipCount = document.getElementById('clip-count');
+            const cutSummary = document.getElementById('cut-summary');
+
+            list.innerHTML = '';
+            clipCount.innerText = `${clips.length} Clips`;
+
+            let keptDuration = 0;
+
+            clips.forEach((clip, idx) => {
+                keptDuration += (clip.end - clip.start);
+                const item = document.createElement('div');
+                item.className = 'p-2.5 bg-slate-950/80 rounded-xl border border-indigo-500/20 flex justify-between items-center hover:border-cyan-400/60 hover:bg-slate-900 cursor-pointer transition shadow-sm';
+                item.innerHTML = `
+                    <span><strong class="text-fuchsia-400">#${idx + 1}</strong> [${clip.start.toFixed(2)}s - ${clip.end.toFixed(2)}s]</span>
+                    <span class="text-[10px] text-cyan-300 bg-slate-900 px-2 py-0.5 rounded-full border border-indigo-500/30">${(clip.end - clip.start).toFixed(2)}s</span>
+                `;
+                item.onclick = () => {
+                    videoPlayer.currentTime = clip.start;
+                    videoPlayer.play();
+                    const x = (clip.start / totalDuration) * waveformCanvas.width;
+                    waveformViewport.scrollLeft = x - 50;
+                };
+                list.appendChild(item);
+            });
+
+            const removedDuration = totalDuration - keptDuration;
+            const removedPercent = totalDuration > 0 ? ((removedDuration / totalDuration) * 100).toFixed(1) : 0;
+            cutSummary.innerText = `ตัดออก ${removedDuration.toFixed(1)}s (${removedPercent}%)`;
+        }
+
+        function escapeXml(unsafe) {
+            return unsafe.replace(/[<>&'"]/g, (c) => {
+                switch (c) {
+                    case '<': return '&lt;'; case '>': return '&gt;';
+                    case '&': return '&amp;'; case '\'': return '&apos;';
+                    case '"': return '&quot;'; default: return c;
+                }
+            });
+        }
+
+        function generateXML(fileName, clips, userFolderPath) {
+            const fps = 60; const timebase = 60; const safeFileName = escapeXml(fileName);
+            let pathUrlTag = '';
+            if (userFolderPath && userFolderPath.trim() !== '') {
+                let cleanFolder = userFolderPath.trim().replace(/\\/g, '/');
+                if (!cleanFolder.startsWith('/')) cleanFolder = '/' + cleanFolder;
+                if (!cleanFolder.endsWith('/')) cleanFolder += '/';
+                pathUrlTag = `<pathurl>file://localhost${encodeURI(cleanFolder + fileName)}</pathurl>`;
+            } else {
+                pathUrlTag = `<pathurl>file://localhost/${safeFileName}</pathurl>`;
+            }
+
+            let videoTrackXml = ''; let audioTrack1Xml = ''; let currentTimelineFrame = 0;
+
+            clips.forEach((clip, idx) => {
+                let inFrame = Math.round(clip.start * fps);
+                let outFrame = Math.round(clip.end * fps);
+                const dur = outFrame - inFrame;
+                const startTimeline = currentTimelineFrame;
+                const endTimeline = startTimeline + dur;
+                currentTimelineFrame = endTimeline;
+
+                const fileBlock = `
+                        <file id="file-1">
+                            <name>${safeFileName}</name>${pathUrlTag}
+                            <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
+                            <media>
+                                <video>
+                                    <samplecharacteristics>
+                                        <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
+                                        <width>1920</width><height>1080</height>
+                                        <pixelaspectratio>square</pixelaspectratio>
+                                    </samplecharacteristics>
+                                </video>
+                                <audio><samplecharacteristics><depth>16</depth><samplerate>48000</samplerate></samplecharacteristics></audio>
+                            </media>
+                        </file>`;
+
+                videoTrackXml += `<clipitem id="clipitem-v-${idx + 1}"><name>${safeFileName}</name><duration>${dur}</duration><rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate><start>${startTimeline}</start><end>${endTimeline}</end><in>${inFrame}</in><out>${outFrame}</out>${fileBlock}</clipitem>`;
+                audioTrack1Xml += `<clipitem id="clipitem-a1-${idx + 1}"><name>${safeFileName}</name><duration>${dur}</duration><rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate><start>${startTimeline}</start><end>${endTimeline}</end><in>${inFrame}</in><out>${outFrame}</out>${fileBlock}<sourcetrack><mediatype>audio</mediatype><trackindex>1</trackindex></sourcetrack></clipitem>`;
+            });
+
+            return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xmeml>
+<xmeml version="5">
+    <sequence id="sequence-1">
+        <name>AutoCut_${safeFileName}</name>
+        <duration>${currentTimelineFrame}</duration>
+        <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
+        <media>
+            <video><track>${videoTrackXml}</track></video>
+            <audio><track>${audioTrack1Xml}</track></audio>
+        </media>
+    </sequence>
+</xmeml>`;
+        }
+
+        document.getElementById('export-xml-btn').addEventListener('click', () => {
+            if (!activeClips.length) return;
+            const xml = generateXML(loadedFileName, activeClips, folderPathInput.value);
+            downloadFile(xml, `${loadedFileName.split('.')[0]}_AutoCut.xml`, 'text/xml');
+        });
+
+        function downloadFile(content, filename, type) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([content], { type: type }));
+            a.download = filename;
+            a.click();
+        }
+
+        // ============================================================
+        // --- MP4 EXPORT (ffmpeg.wasm ตัดจริงในเบราว์เซอร์ ไม่ต้องมีเซิร์ฟเวอร์) ---
+        // ============================================================
+        let ffmpegInstance = null;
+        let ffmpegLoadingPromise = null;
+
+        function waitForFFmpegLib() {
+            if (window.__FFmpegLib) return Promise.resolve(window.__FFmpegLib);
+            return new Promise((resolve) => {
+                window.addEventListener('ffmpeg-lib-ready', () => resolve(window.__FFmpegLib), { once: true });
+            });
+        }
+
+        async function getFFmpeg(onLog) {
+            if (ffmpegInstance) return ffmpegInstance;
+            if (ffmpegLoadingPromise) return ffmpegLoadingPromise;
+
+            ffmpegLoadingPromise = (async () => {
+                const { FFmpeg, toBlobURL } = await waitForFFmpegLib();
+                const ff = new FFmpeg();
+                if (onLog) {
+                    ff.on('log', ({ message }) => onLog(message));
+                }
+                const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
+                await ff.load({
+                    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+                    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
+                });
+                ffmpegInstance = ff;
+                return ff;
+            })();
+
+            return ffmpegLoadingPromise;
+        }
+
+        const exportMp4Btn = document.getElementById('export-mp4-btn');
+        const exportMp4BtnLabel = document.getElementById('export-mp4-btn-label');
+        const mp4ProgressWrap = document.getElementById('mp4-progress-wrap');
+        const mp4ProgressBar = document.getElementById('mp4-progress-bar');
+        const mp4ProgressText = document.getElementById('mp4-progress-text');
+
+        function setMp4Progress(percent, text) {
+            mp4ProgressBar.style.width = `${Math.max(0, Math.min(100, percent))}%`;
+            if (text) mp4ProgressText.innerText = text;
+        }
+
+        exportMp4Btn.addEventListener('click', async () => {
+            if (!activeClips.length || !loadedFile) return;
+
+            exportMp4Btn.disabled = true;
+            document.getElementById('export-xml-btn').disabled = true;
+            exportMp4BtnLabel.innerText = 'กำลังตัดต่อ...';
+            mp4ProgressWrap.classList.remove('hidden');
+            setMp4Progress(2, 'กำลังโหลดตัวประมวลผลวิดีโอ (ครั้งแรกอาจใช้เวลาสักครู่)...');
+
+            try {
+                const { fetchFile } = await waitForFFmpegLib();
+                const ff = await getFFmpeg();
+
+                ff.on('progress', ({ progress }) => {
+                    // progress คือ 0-1 ของงานที่ ffmpeg กำลังทำอยู่ ณ ขณะนั้น (ต่อคำสั่ง)
+                });
+
+                const inputExt = (loadedFile.name.split('.').pop() || 'mp4').toLowerCase();
+                const inputName = `input.${inputExt}`;
+
+                setMp4Progress(8, 'กำลังโหลดไฟล์วิดีโอต้นฉบับเข้าตัวประมวลผล...');
+                await ff.writeFile(inputName, await fetchFile(loadedFile));
+
+                const clipFileNames = [];
+                const totalSteps = activeClips.length + 1; // +1 สำหรับขั้นตอนต่อคลิปทั้งหมดเข้าด้วยกัน
+
+                for (let i = 0; i < activeClips.length; i++) {
+                    const clip = activeClips[i];
+                    const outName = `clip_${String(i).padStart(4, '0')}.mp4`;
+                    const dur = Math.max(0.05, clip.end - clip.start);
+
+                    const baseProgress = 10 + (i / totalSteps) * 80;
+                    setMp4Progress(baseProgress, `กำลังตัดคลิปที่ ${i + 1} / ${activeClips.length} (${dur.toFixed(1)}s)...`);
+
+                    // re-encode ทุกคลิปเพื่อให้รอยตัดสะอาด (ไม่ใช้ -c copy เพราะจุดตัดอาจไม่ตรง keyframe)
+                    await ff.exec([
+                        '-ss', clip.start.toFixed(3),
+                        '-i', inputName,
+                        '-t', dur.toFixed(3),
+                        '-c:v', 'libx264',
+                        '-preset', 'ultrafast',
+                        '-crf', '22',
+                        '-pix_fmt', 'yuv420p',
+                        '-c:a', 'aac',
+                        '-b:a', '160k',
+                        '-avoid_negative_ts', 'make_zero',
+                        outName
+                    ]);
+
+                    clipFileNames.push(outName);
+                }
+
+                setMp4Progress(92, 'กำลังต่อคลิปทั้งหมดเข้าด้วยกัน...');
+
+                const concatListContent = clipFileNames.map(name => `file '${name}'`).join('\n');
+                await ff.writeFile('concat_list.txt', concatListContent);
+
+                await ff.exec([
+                    '-f', 'concat',
+                    '-safe', '0',
+                    '-i', 'concat_list.txt',
+                    '-c', 'copy',
+                    'output.mp4'
+                ]);
+
+                setMp4Progress(97, 'กำลังเตรียมไฟล์ให้ดาวน์โหลด...');
+
+                const outputData = await ff.readFile('output.mp4');
+                const blob = new Blob([outputData.buffer], { type: 'video/mp4' });
+                const outFileName = `${loadedFileName.split('.')[0]}_AutoCut.mp4`;
+
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = outFileName;
+                a.click();
+
+                // ล้างไฟล์ชั่วคราวใน virtual FS ของ ffmpeg เพื่อคืนหน่วยความจำ
+                try {
+                    for (const name of clipFileNames) await ff.deleteFile(name);
+                    await ff.deleteFile('concat_list.txt');
+                    await ff.deleteFile('output.mp4');
+                    await ff.deleteFile(inputName);
+                } catch (cleanupErr) { /* เพิกเฉยถ้าลบไม่สำเร็จ */ }
+
+                setMp4Progress(100, `เสร็จสิ้น! ดาวน์โหลด ${outFileName} แล้ว`);
+                setTimeout(() => { mp4ProgressWrap.classList.add('hidden'); }, 3000);
+
+            } catch (err) {
+                console.error(err);
+                setMp4Progress(0, 'เกิดข้อผิดพลาด: ' + err.message);
+                alert('ไม่สามารถ Export MP4 ได้: ' + err.message);
+            } finally {
+                exportMp4Btn.disabled = false;
+                document.getElementById('export-xml-btn').disabled = false;
+                exportMp4BtnLabel.innerText = 'Export วิดีโอ (.MP4)';
+            }
+        });
+
+        document.getElementById('ai-analyze-btn').addEventListener('click', async () => {
+            const apiKey = document.getElementById('api-key').value.trim();
+            if (!apiKey) return alert('กรุณากรอก Groq API Key ก่อนครับ');
+
+            const aiBtn = document.getElementById('ai-analyze-btn');
+            const resultBox = document.getElementById('ai-result-box');
+            const resultText = document.getElementById('ai-result-text');
+
+            aiBtn.disabled = true;
+            aiBtn.innerText = "Groq AI กำลังวิเคราะห์...";
+            resultBox.classList.remove('hidden');
+
+            const clipsSummary = activeClips.map((c, i) => `#${i + 1}: เริ่ม ${c.start.toFixed(1)}s - จบ ${c.end.toFixed(1)}s (ยาว ${(c.end - c.start).toFixed(1)}s)`).join('\n');
+            const prompt = `คุณคือผู้เชี่ยวชาญด้านการตัดต่อวิดีโอสั้น รายการคลิปที่ตัดเงียบออกแล้ว:\n${clipsSummary}\n\nช่วยเลือกช่วงคลิปที่ดีที่สุด 1-2 ช่วงทำไฮไลท์ TikTok/Reels และแนะนำ Hook วินาทีแรกครับ`;
+
+            try {
+                const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+                    body: JSON.stringify({
+                        model: 'llama-3.3-70b-versatile',
+                        messages: [{ role: 'user', content: prompt }]
+                    })
+                });
+
+                const data = await response.json();
+                if (data.choices && data.choices[0]?.message?.content) {
+                    resultText.innerHTML = data.choices[0].message.content.replace(/\n/g, '<br>');
+                }
+            } catch (err) {
+                resultText.innerText = "เชื่อมต่อล้มเหลว: " + err.message;
+            }
+
+            aiBtn.disabled = false;
+            aiBtn.innerText = "วิเคราะห์หาช็อตเด็ดด้วย Groq AI";
+        });
+    </script>
+</body>
+
+</html>
