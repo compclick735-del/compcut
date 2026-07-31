@@ -406,43 +406,30 @@
                         </svg>
                         <span id="export-mp4-btn-label">Export วิดีโอ (.MP4)</span>
                     </button>
-                    <div id="mp4-progress-wrap" class="hidden space-y-1.5">
-                        <div class="w-full h-2 bg-slate-900 rounded-full overflow-hidden border border-indigo-500/20">
-                            <div id="mp4-progress-bar"
-                                class="h-full bg-gradient-to-r from-cyan-400 to-emerald-400 transition-all duration-200"
-                                style="width:0%"></div>
-                        </div>
-                        <p id="mp4-progress-text" class="text-[10px] font-mono text-slate-400 text-center">
-                            กำลังเตรียมตัวตัดต่อ...</p>
+                </div>
+
+                <!-- Groq AI -->
+                <div class="glass-panel rounded-2xl p-5 space-y-4">
+                    <h2 class="text-sm font-bold text-slate-200 border-b border-indigo-500/20 pb-3">Groq AI Highlight
+                        Finder
+                    </h2>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1.5">Groq API Key</label>
+                        <input type="password" id="api-key" placeholder="วาง API Key จาก console.groq.com"
+                            class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 font-mono">
                     </div>
-                    <button id="export-xml-btn"
-                        class="w-full py-3 bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white text-xs font-bold rounded-xl shadow-lg hover:opacity-90 transition">
-                        Export Premiere (.XML)
+                    <button id="ai-analyze-btn" disabled
+                        class="w-full py-3 bg-gradient-to-r from-cyan-500 to-indigo-600 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-600 text-white font-bold text-xs rounded-xl shadow-lg transition">
+                        วิเคราะห์หาช็อตเด็ดด้วย Groq AI
                     </button>
+                    <div id="ai-result-box"
+                        class="hidden mt-2 p-4 bg-slate-950/90 border border-indigo-500/30 rounded-xl text-xs text-slate-300 leading-relaxed max-h-52 overflow-y-auto">
+                        <strong class="text-cyan-400 block mb-1.5">คำแนะนำจาก Groq AI:</strong>
+                        <div id="ai-result-text">กำลังประมวลผล...</div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Groq AI -->
-            <div class="glass-panel rounded-2xl p-5 space-y-4">
-                <h2 class="text-sm font-bold text-slate-200 border-b border-indigo-500/20 pb-3">Groq AI Highlight Finder
-                </h2>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1.5">Groq API Key</label>
-                    <input type="password" id="api-key" placeholder="วาง API Key จาก console.groq.com"
-                        class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 font-mono">
-                </div>
-                <button id="ai-analyze-btn" disabled
-                    class="w-full py-3 bg-gradient-to-r from-cyan-500 to-indigo-600 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-600 text-white font-bold text-xs rounded-xl shadow-lg transition">
-                    วิเคราะห์หาช็อตเด็ดด้วย Groq AI
-                </button>
-                <div id="ai-result-box"
-                    class="hidden mt-2 p-4 bg-slate-950/90 border border-indigo-500/30 rounded-xl text-xs text-slate-300 leading-relaxed max-h-52 overflow-y-auto">
-                    <strong class="text-cyan-400 block mb-1.5">คำแนะนำจาก Groq AI:</strong>
-                    <div id="ai-result-text">กำลังประมวลผล...</div>
-                </div>
             </div>
-
-        </div>
     </main>
 
     <!-- FFmpeg.wasm (loaded as an ES module, exposed on window for the main script to use) -->
