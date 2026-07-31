@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html lang="th">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AutoCut Pro - Cosmic Space Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <!-- Supabase SDK Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -16,7 +14,7 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #030712;
-            background-image:
+            background-image: 
                 radial-gradient(at 10% 10%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
                 radial-gradient(at 90% 20%, rgba(217, 70, 239, 0.12) 0px, transparent 50%),
                 radial-gradient(at 50% 80%, rgba(6, 182, 212, 0.12) 0px, transparent 50%);
@@ -34,7 +32,6 @@
         .glass-panel-interactive {
             transition: all 0.3s ease;
         }
-
         .glass-panel-interactive:hover {
             border-color: rgba(168, 85, 247, 0.4);
             box-shadow: 0 0 25px rgba(168, 85, 247, 0.15);
@@ -46,7 +43,7 @@
             border-color: rgba(192, 132, 252, 0.8);
             box-shadow: 0 0 15px rgba(168, 85, 247, 0.5);
         }
-
+        
         .speed-btn.active {
             background: #06b6d4;
             color: #030712;
@@ -54,33 +51,15 @@
             box-shadow: 0 0 10px rgba(6, 182, 212, 0.6);
         }
 
-        .waveform-scroll::-webkit-scrollbar {
-            height: 6px;
-        }
+        .waveform-scroll::-webkit-scrollbar { height: 6px; }
+        .waveform-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.8); }
+        .waveform-scroll::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.5); border-radius: 9999px; }
+        .waveform-scroll::-webkit-scrollbar-thumb:hover { background: #a855f7; }
 
-        .waveform-scroll::-webkit-scrollbar-track {
-            background: rgba(15, 23, 42, 0.8);
-        }
-
-        .waveform-scroll::-webkit-scrollbar-thumb {
-            background: rgba(99, 102, 241, 0.5);
-            border-radius: 9999px;
-        }
-
-        .waveform-scroll::-webkit-scrollbar-thumb:hover {
-            background: #a855f7;
-        }
-
-        .glow-purple {
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
-        }
-
-        input[type=range] {
-            accent-color: #a855f7;
-        }
+        .glow-purple { box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+        input[type=range] { accent-color: #a855f7; }
     </style>
 </head>
-
 <body class="text-slate-100 min-h-screen pb-12 select-none relative overflow-x-hidden">
 
     <!-- Ambient Stars -->
@@ -90,20 +69,15 @@
     </div>
 
     <!-- Header -->
-    <header
-        class="border-b border-indigo-500/20 bg-slate-950/70 backdrop-blur-xl sticky top-0 z-50 py-4 px-6 shadow-2xl">
+    <header class="border-b border-indigo-500/20 bg-slate-950/70 backdrop-blur-xl sticky top-0 z-50 py-4 px-6 shadow-2xl">
         <div class="max-w-[1600px] mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <div
-                    class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-fuchsia-500 flex items-center justify-center shadow-lg glow-purple font-mono font-bold text-xs text-white">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-fuchsia-500 flex items-center justify-center shadow-lg glow-purple font-mono font-bold text-xs text-white">
                     AC
                 </div>
                 <div>
-                    <h1
-                        class="text-lg font-extrabold tracking-wider bg-gradient-to-r from-cyan-400 via-fuchsia-300 to-indigo-300 bg-clip-text text-transparent">
-                        AUTOCUT PRO <span id="plan-badge"
-                            class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-600 uppercase tracking-widest ml-1">GUEST
-                            (Max 3m)</span>
+                    <h1 class="text-lg font-extrabold tracking-wider bg-gradient-to-r from-cyan-400 via-fuchsia-300 to-indigo-300 bg-clip-text text-transparent">
+                        AUTOCUT PRO <span id="plan-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-600 uppercase tracking-widest ml-1">GUEST (Max 3m)</span>
                     </h1>
                     <p class="text-[10px] text-slate-400">AI-Powered Silence Cutter & Highlight Finder</p>
                 </div>
@@ -112,41 +86,30 @@
             <!-- Auth & Action Section -->
             <div class="flex items-center gap-3">
                 <!-- Upgrade Pro Button -->
-                <button id="upgrade-btn" onclick="handleUpgrade()"
-                    class="flex items-center gap-1.5 bg-gradient-to-r from-amber-500 via-fuchsia-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all duration-300 shadow-lg hover:shadow-amber-500/25 active:scale-95 border border-amber-300/40">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
+                <button id="upgrade-btn" onclick="handleUpgrade()" class="flex items-center gap-1.5 bg-gradient-to-r from-amber-500 via-fuchsia-500 to-indigo-600 hover:from-amber-400 hover:to-indigo-500 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition-all duration-300 shadow-lg hover:shadow-amber-500/25 active:scale-95 border border-amber-300/40">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                     <span>Upgrade PRO</span>
                 </button>
 
                 <!-- Logged Out State -->
-                <button id="google-login-btn" onclick="loginWithGoogle()"
-                    class="flex items-center gap-2.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-indigo-500/30 hover:border-cyan-400/60 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 shadow-lg hover:shadow-cyan-500/10 active:scale-95">
+                <button id="google-login-btn" onclick="loginWithGoogle()" class="flex items-center gap-2.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-indigo-500/30 hover:border-cyan-400/60 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 shadow-lg hover:shadow-cyan-500/10 active:scale-95">
                     <svg class="w-4 h-4" viewBox="0 0 24 24">
-                        <path fill="#4285F4"
-                            d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z" />
-                        <path fill="#34A853"
-                            d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.15C3.26 21.3 7.31 24 12 24z" />
-                        <path fill="#FBBC05"
-                            d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.39l3.99-3.15z" />
-                        <path fill="#EA4335"
-                            d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.61l3.99 3.15c.95-2.85 3.6-4.96 6.72-4.96z" />
+                        <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+                        <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.15C3.26 21.3 7.31 24 12 24z"/>
+                        <path fill="#FBBC05" d="M5.28 14.24c-.25-.72-.38-1.49-.38-2.24s.13-1.52.38-2.24V6.61H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.39l3.99-3.15z"/>
+                        <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.61l3.99 3.15c.95-2.85 3.6-4.96 6.72-4.96z"/>
                     </svg>
                     <span>Sign in with Google</span>
                 </button>
 
                 <!-- Logged In State -->
-                <div id="user-profile"
-                    class="hidden flex items-center gap-3 bg-slate-900/90 border border-indigo-500/30 px-3 py-1.5 rounded-xl shadow-lg">
+                <div id="user-profile" class="hidden flex items-center gap-3 bg-slate-900/90 border border-indigo-500/30 px-3 py-1.5 rounded-xl shadow-lg">
                     <img id="user-avatar" src="" alt="Avatar" class="w-7 h-7 rounded-full border border-cyan-400">
                     <div class="text-left hidden sm:block">
                         <div id="user-name" class="text-xs font-bold text-cyan-300">User Name</div>
                         <div id="user-email" class="text-[9px] font-mono text-slate-400">user@email.com</div>
                     </div>
-                    <button onclick="logout()"
-                        class="text-[10px] font-mono text-rose-400 hover:text-rose-300 bg-rose-950/50 hover:bg-rose-900/80 px-2.5 py-1 rounded-lg border border-rose-500/30 transition">
+                    <button onclick="logout()" class="text-[10px] font-mono text-rose-400 hover:text-rose-300 bg-rose-950/50 hover:bg-rose-900/80 px-2.5 py-1 rounded-lg border border-rose-500/30 transition">
                         LOGOUT
                     </button>
                 </div>
@@ -167,18 +130,12 @@
                         VIDEO PREVIEW STUDIO
                     </span>
                 </div>
-                <div
-                    class="relative w-full aspect-video bg-slate-950 rounded-xl overflow-hidden border border-indigo-500/30 flex items-center justify-center shadow-2xl min-h-[380px] md:min-h-[480px]">
+                <div class="relative w-full aspect-video bg-slate-950 rounded-xl overflow-hidden border border-indigo-500/30 flex items-center justify-center shadow-2xl min-h-[380px] md:min-h-[480px]">
                     <video id="video-player" class="w-full h-full object-contain hidden" controls></video>
                     <div id="video-placeholder" class="text-slate-500 text-center p-6 space-y-3">
-                        <svg class="w-16 h-16 mx-auto text-indigo-500/40 animate-pulse" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                        </svg>
+                        <svg class="w-16 h-16 mx-auto text-indigo-500/40 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                         <p class="text-sm font-bold text-slate-300">หน้าจอเล่นวิดีโอพรีวิว</p>
-                        <p class="text-xs text-slate-500">
-                            เลือกหรือลากไฟล์วิดีโอมาวางที่แถบเครื่องมือทางขวาเพื่อเริ่มแสดงผล</p>
+                        <p class="text-xs text-slate-500">เลือกหรือลากไฟล์วิดีโอมาวางที่แถบเครื่องมือทางขวาเพื่อเริ่มแสดงผล</p>
                     </div>
                 </div>
             </div>
@@ -189,80 +146,53 @@
                     <span class="text-xs font-bold text-slate-200 flex items-center gap-2 tracking-wide">
                         AutoCut Silence Visualizer
                     </span>
-                    <span id="cut-summary"
-                        class="text-xs font-mono text-rose-300 font-bold bg-rose-950/60 px-3 py-1 rounded-full border border-rose-500/30 shadow-lg">
+                    <span id="cut-summary" class="text-xs font-mono text-rose-300 font-bold bg-rose-950/60 px-3 py-1 rounded-full border border-rose-500/30 shadow-lg">
                         ตัดออก 0s (0%)
                     </span>
                 </div>
 
                 <!-- Display Canvas -->
-                <div
-                    class="relative bg-slate-950/90 border border-indigo-500/20 rounded-xl overflow-hidden shadow-inner group">
-                    <div id="waveform-viewport"
-                        class="waveform-scroll overflow-x-auto overflow-y-hidden relative h-64 w-full cursor-pointer">
+                <div class="relative bg-slate-950/90 border border-indigo-500/20 rounded-xl overflow-hidden shadow-inner group">
+                    <div id="waveform-viewport" class="waveform-scroll overflow-x-auto overflow-y-hidden relative h-64 w-full cursor-pointer">
                         <canvas id="waveform-canvas" class="block h-full"></canvas>
                     </div>
 
-                    <div
-                        class="absolute bottom-3 left-3 right-3 flex justify-between items-center pointer-events-none z-10">
-                        <div
-                            class="flex items-center gap-2 bg-slate-950/90 backdrop-blur-md border border-indigo-500/30 rounded-xl p-1.5 pointer-events-auto shadow-2xl">
-                            <button id="play-pause-btn"
-                                class="px-2.5 py-1 hover:bg-indigo-900/50 rounded-lg text-xs font-mono font-bold text-slate-200 transition">
+                    <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center pointer-events-none z-10">
+                        <div class="flex items-center gap-2 bg-slate-950/90 backdrop-blur-md border border-indigo-500/30 rounded-xl p-1.5 pointer-events-auto shadow-2xl">
+                            <button id="play-pause-btn" class="px-2.5 py-1 hover:bg-indigo-900/50 rounded-lg text-xs font-mono font-bold text-slate-200 transition">
                                 PLAY
                             </button>
                             <div class="h-4 w-[1px] bg-indigo-500/30"></div>
                             <div class="flex gap-1 text-[10px] font-mono">
-                                <button class="speed-btn active px-2 py-0.5 rounded-md text-slate-300 transition"
-                                    data-speed="1">x1</button>
-                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition"
-                                    data-speed="1.2">x1.2</button>
-                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition"
-                                    data-speed="1.5">x1.5</button>
-                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition"
-                                    data-speed="1.7">x1.7</button>
-                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition"
-                                    data-speed="2">x2</button>
+                                <button class="speed-btn active px-2 py-0.5 rounded-md text-slate-300 transition" data-speed="1">x1</button>
+                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition" data-speed="1.2">x1.2</button>
+                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition" data-speed="1.5">x1.5</button>
+                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition" data-speed="1.7">x1.7</button>
+                                <button class="speed-btn px-2 py-0.5 rounded-md text-slate-300 transition" data-speed="2">x2</button>
                             </div>
                         </div>
 
-                        <div
-                            class="flex items-center gap-2 bg-slate-950/90 backdrop-blur-md border border-indigo-500/30 rounded-xl px-3 py-1.5 pointer-events-auto shadow-2xl">
+                        <div class="flex items-center gap-2 bg-slate-950/90 backdrop-blur-md border border-indigo-500/30 rounded-xl px-3 py-1.5 pointer-events-auto shadow-2xl">
                             <span class="text-[10px] font-mono uppercase text-slate-400">Zoom</span>
-                            <button id="zoom-out-btn"
-                                class="text-xs text-slate-400 hover:text-cyan-400 px-1 font-bold">-</button>
-                            <input type="range" id="zoom-slider" min="1" max="10" step="0.1" value="1"
-                                class="w-24 accent-fuchsia-500 h-1 bg-slate-800 rounded cursor-pointer">
-                            <button id="zoom-in-btn"
-                                class="text-xs text-slate-400 hover:text-cyan-400 px-1 font-bold">+</button>
-                            <span id="zoom-val"
-                                class="text-[10px] font-mono text-fuchsia-400 font-bold w-6 text-right">1x</span>
+                            <button id="zoom-out-btn" class="text-xs text-slate-400 hover:text-cyan-400 px-1 font-bold">-</button>
+                            <input type="range" id="zoom-slider" min="1" max="10" step="0.1" value="1" class="w-24 accent-fuchsia-500 h-1 bg-slate-800 rounded cursor-pointer">
+                            <button id="zoom-in-btn" class="text-xs text-slate-400 hover:text-cyan-400 px-1 font-bold">+</button>
+                            <span id="zoom-val" class="text-[10px] font-mono text-fuchsia-400 font-bold w-6 text-right">1x</span>
                         </div>
                     </div>
                 </div>
 
-                <div
-                    class="flex justify-center items-center gap-6 text-[11px] font-mono text-slate-400 py-1 border-t border-indigo-500/10">
-                    <span class="flex items-center gap-1.5"><span
-                            class="w-3 h-3 rounded-full bg-cyan-500/80 inline-block shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span>
-                        Margins</span>
-                    <span class="flex items-center gap-1.5"><span
-                            class="w-3 h-3 rounded-full bg-rose-600/80 inline-block shadow-[0_0_8px_rgba(225,29,72,0.8)]"></span>
-                        Silences</span>
-                    <span class="flex items-center gap-1.5"><span
-                            class="w-4 h-[2px] bg-fuchsia-500 inline-block"></span> Noise Threshold</span>
+                <div class="flex justify-center items-center gap-6 text-[11px] font-mono text-slate-400 py-1 border-t border-indigo-500/10">
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-cyan-500/80 inline-block shadow-[0_0_8px_rgba(6,182,212,0.8)]"></span> Margins</span>
+                    <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-600/80 inline-block shadow-[0_0_8px_rgba(225,29,72,0.8)]"></span> Silences</span>
+                    <span class="flex items-center gap-1.5"><span class="w-4 h-[2px] bg-fuchsia-500 inline-block"></span> Noise Threshold</span>
                 </div>
 
-                <div class="relative h-12 bg-slate-950 border border-indigo-500/20 rounded-xl overflow-hidden cursor-grab active:cursor-grabbing shadow-inner"
-                    id="minimap-container">
+                <div class="relative h-12 bg-slate-950 border border-indigo-500/20 rounded-xl overflow-hidden cursor-grab active:cursor-grabbing shadow-inner" id="minimap-container">
                     <canvas id="minimap-canvas" class="w-full h-full block"></canvas>
-                    <div id="minimap-viewport-box"
-                        class="absolute top-0 bottom-0 border-2 border-fuchsia-500 bg-fuchsia-500/20 rounded-lg pointer-events-none">
-                    </div>
-                    <div class="absolute bottom-1 left-2 text-[9px] font-mono text-slate-500 pointer-events-none"
-                        id="time-start-label">00:00</div>
-                    <div class="absolute bottom-1 right-2 text-[9px] font-mono text-slate-500 pointer-events-none"
-                        id="time-end-label">00:00</div>
+                    <div id="minimap-viewport-box" class="absolute top-0 bottom-0 border-2 border-fuchsia-500 bg-fuchsia-500/20 rounded-lg pointer-events-none"></div>
+                    <div class="absolute bottom-1 left-2 text-[9px] font-mono text-slate-500 pointer-events-none" id="time-start-label">00:00</div>
+                    <div class="absolute bottom-1 right-2 text-[9px] font-mono text-slate-500 pointer-events-none" id="time-end-label">00:00</div>
                 </div>
             </div>
 
@@ -277,26 +207,22 @@
                     1. กำหนด FOLDER PATH ของวิดีโอ (ป้องกัน MEDIA OFFLINE)
                 </label>
                 <div class="relative">
-                    <input type="text" id="folder-path-input" placeholder="เช่น C:\from OBS หรือ D:\Projects\Game"
+                    <input type="text" id="folder-path-input" placeholder="เช่น C:\from OBS หรือ D:\Projects\Game" 
                         class="w-full bg-slate-950/80 border border-indigo-500/30 rounded-xl px-4 py-3 text-xs text-cyan-200 font-mono focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400/50 transition placeholder:text-slate-600 shadow-inner">
                 </div>
             </div>
 
             <!-- Upload Zone -->
             <div class="glass-panel rounded-2xl p-5 space-y-3">
-                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block">2.
-                    เลือกไฟล์วิดีโอ</label>
-                <div id="drop-zone"
-                    class="border-2 border-dashed border-indigo-500/30 hover:border-cyan-400 bg-slate-950/40 rounded-xl p-6 text-center cursor-pointer transition-all duration-300 group">
+                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block">2. เลือกไฟล์วิดีโอ</label>
+                <div id="drop-zone" class="border-2 border-dashed border-indigo-500/30 hover:border-cyan-400 bg-slate-950/40 rounded-xl p-6 text-center cursor-pointer transition-all duration-300 group">
                     <input type="file" id="video-input" accept="video/*" class="hidden">
                     <div class="space-y-2 pointer-events-none">
-                        <div
-                            class="w-10 h-10 rounded-full bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center mx-auto text-cyan-400 font-mono font-bold text-lg group-hover:scale-110 transition-all duration-300">
+                        <div class="w-10 h-10 rounded-full bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center mx-auto text-cyan-400 font-mono font-bold text-lg group-hover:scale-110 transition-all duration-300">
                             +
                         </div>
                         <p class="text-xs font-semibold text-slate-200">วางไฟล์วิดีโอที่นี่ หรือคลิกเพื่อเลือกไฟล์</p>
-                        <p id="path-preview"
-                            class="text-[10px] font-mono text-fuchsia-400 truncate max-w-xs mx-auto hidden"></p>
+                        <p id="path-preview" class="text-[10px] font-mono text-fuchsia-400 truncate max-w-xs mx-auto hidden"></p>
                     </div>
                 </div>
             </div>
@@ -306,21 +232,11 @@
                 <div>
                     <label class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-3">Presets</label>
                     <div class="flex flex-wrap gap-2.5" id="presets-container">
-                        <button
-                            class="preset-btn px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300"
-                            data-preset="calm">Calm</button>
-                        <button
-                            class="preset-btn px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300"
-                            data-preset="measured">Measured</button>
-                        <button
-                            class="preset-btn active px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300"
-                            data-preset="paced">Paced</button>
-                        <button
-                            class="preset-btn px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300"
-                            data-preset="energetic">Energetic</button>
-                        <button
-                            class="preset-btn px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300"
-                            data-preset="jumpy">Jumpy</button>
+                        <button class="preset-btn px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300" data-preset="calm">Calm</button>
+                        <button class="preset-btn px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300" data-preset="measured">Measured</button>
+                        <button class="preset-btn active px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300" data-preset="paced">Paced</button>
+                        <button class="preset-btn px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300" data-preset="energetic">Energetic</button>
+                        <button class="preset-btn px-3 py-1.5 rounded-xl bg-slate-900/80 border border-indigo-500/20 text-xs text-slate-300" data-preset="jumpy">Jumpy</button>
                     </div>
                 </div>
 
@@ -330,44 +246,38 @@
                     <div>
                         <label class="text-xs text-slate-400 block mb-1.5">Remove Silences Longer Than</label>
                         <div class="relative">
-                            <input type="number" id="remove-silence-ms" value="200"
-                                class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
+                            <input type="number" id="remove-silence-ms" value="200" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
                             <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
                         </div>
                     </div>
                     <div>
                         <label class="text-xs text-slate-400 block mb-1.5">Margin Before By</label>
                         <div class="relative">
-                            <input type="number" id="margin-before-ms" value="50"
-                                class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
+                            <input type="number" id="margin-before-ms" value="50" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
                             <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
                         </div>
                     </div>
                     <div>
                         <div class="flex justify-between items-center mb-1.5">
                             <label class="text-xs text-slate-400">Minimum Time Between Cuts</label>
-                            <input type="checkbox" id="enable-min-cut" checked
-                                class="accent-fuchsia-500 cursor-pointer">
+                            <input type="checkbox" id="enable-min-cut" checked class="accent-fuchsia-500 cursor-pointer">
                         </div>
                         <div class="relative">
-                            <input type="number" id="min-cut-ms" value="800"
-                                class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
+                            <input type="number" id="min-cut-ms" value="800" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
                             <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
                         </div>
                     </div>
                     <div>
                         <label class="text-xs text-slate-400 block mb-1.5">Keep Talks Longer Than</label>
                         <div class="relative">
-                            <input type="number" id="keep-talks-ms" value="100"
-                                class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
+                            <input type="number" id="keep-talks-ms" value="100" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
                             <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
                         </div>
                     </div>
                     <div>
                         <label class="text-xs text-slate-400 block mb-1.5">Margin After By</label>
                         <div class="relative">
-                            <input type="number" id="margin-after-ms" value="50"
-                                class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
+                            <input type="number" id="margin-after-ms" value="50" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-cyan-300 font-mono">
                             <span class="absolute right-3 top-2.5 text-[10px] font-mono text-slate-500">ms</span>
                         </div>
                     </div>
@@ -376,69 +286,47 @@
                             <label class="text-xs text-fuchsia-400 font-semibold">Silence Threshold</label>
                             <span id="thresh-val" class="text-xs font-mono text-fuchsia-400 font-bold">-35dB</span>
                         </div>
-                        <input type="range" id="threshold-db" min="-60" max="-15" value="-35"
-                            class="w-full bg-slate-800 cursor-pointer">
+                        <input type="range" id="threshold-db" min="-60" max="-15" value="-35" class="w-full bg-slate-800 cursor-pointer">
                     </div>
                 </div>
             </div>
 
             <!-- Clips List & Export -->
             <div class="glass-panel rounded-2xl p-5 space-y-4">
-                <h2
-                    class="text-sm font-bold text-slate-200 flex justify-between items-center border-b border-indigo-500/20 pb-3">
+                <h2 class="text-sm font-bold text-slate-200 flex justify-between items-center border-b border-indigo-500/20 pb-3">
                     <span>รายการคลิปที่ถูกตัด</span>
-                    <span id="clip-count"
-                        class="text-xs font-mono text-cyan-300 bg-cyan-950/80 px-3 py-1 rounded-full border border-cyan-500/30">0
-                        Clips</span>
+                    <span id="clip-count" class="text-xs font-mono text-cyan-300 bg-cyan-950/80 px-3 py-1 rounded-full border border-cyan-500/30">0 Clips</span>
                 </h2>
 
-                <div id="clips-list"
-                    class="max-h-[380px] overflow-y-auto space-y-2 pr-1 text-xs text-slate-300 font-mono">
+                <div id="clips-list" class="max-h-[380px] overflow-y-auto space-y-2 pr-1 text-xs text-slate-300 font-mono">
                     <p class="text-slate-600 text-center py-10">ลากไฟล์วิดีโอเพื่อเริ่มสแกนคลื่นเสียง</p>
                 </div>
 
-                <div id="export-group" class="hidden pt-3 border-t border-indigo-500/20 space-y-2.5">
-                    <button id="export-mp4-btn"
-                        class="w-full py-3 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg hover:opacity-90 transition flex items-center justify-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M7 10l5 5 5-5M12 15V3" />
-                        </svg>
-                        <span id="export-mp4-btn-label">Export วิดีโอ (.MP4)</span>
+                <div id="export-group" class="hidden pt-3 border-t border-indigo-500/20">
+                    <button id="export-xml-btn" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white text-xs font-bold rounded-xl shadow-lg hover:opacity-90 transition">
+                        Export Premiere (.XML)
                     </button>
                 </div>
-
-                <!-- Groq AI -->
-                <div class="glass-panel rounded-2xl p-5 space-y-4">
-                    <h2 class="text-sm font-bold text-slate-200 border-b border-indigo-500/20 pb-3">Groq AI Highlight
-                        Finder
-                    </h2>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1.5">Groq API Key</label>
-                        <input type="password" id="api-key" placeholder="วาง API Key จาก console.groq.com"
-                            class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 font-mono">
-                    </div>
-                    <button id="ai-analyze-btn" disabled
-                        class="w-full py-3 bg-gradient-to-r from-cyan-500 to-indigo-600 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-600 text-white font-bold text-xs rounded-xl shadow-lg transition">
-                        วิเคราะห์หาช็อตเด็ดด้วย Groq AI
-                    </button>
-                    <div id="ai-result-box"
-                        class="hidden mt-2 p-4 bg-slate-950/90 border border-indigo-500/30 rounded-xl text-xs text-slate-300 leading-relaxed max-h-52 overflow-y-auto">
-                        <strong class="text-cyan-400 block mb-1.5">คำแนะนำจาก Groq AI:</strong>
-                        <div id="ai-result-text">กำลังประมวลผล...</div>
-                    </div>
-                </div>
-
             </div>
-    </main>
 
-    <!-- FFmpeg.wasm (loaded as an ES module, exposed on window for the main script to use) -->
-    <script type="module">
-        import { FFmpeg } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.12.10/dist/esm/index.js';
-        import { fetchFile, toBlobURL } from 'https://cdn.jsdelivr.net/npm/@ffmpeg/util@0.12.1/dist/esm/index.js';
-        window.__FFmpegLib = { FFmpeg, fetchFile, toBlobURL };
-        window.dispatchEvent(new Event('ffmpeg-lib-ready'));
-    </script>
+            <!-- Groq AI -->
+            <div class="glass-panel rounded-2xl p-5 space-y-4">
+                <h2 class="text-sm font-bold text-slate-200 border-b border-indigo-500/20 pb-3">Groq AI Highlight Finder</h2>
+                <div>
+                    <label class="block text-xs text-slate-400 mb-1.5">Groq API Key</label>
+                    <input type="password" id="api-key" placeholder="วาง API Key จาก console.groq.com" class="w-full bg-slate-950/80 border border-indigo-500/20 rounded-xl px-3.5 py-2.5 text-xs text-slate-100 font-mono">
+                </div>
+                <button id="ai-analyze-btn" disabled class="w-full py-3 bg-gradient-to-r from-cyan-500 to-indigo-600 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-600 text-white font-bold text-xs rounded-xl shadow-lg transition">
+                    วิเคราะห์หาช็อตเด็ดด้วย Groq AI
+                </button>
+                <div id="ai-result-box" class="hidden mt-2 p-4 bg-slate-950/90 border border-indigo-500/30 rounded-xl text-xs text-slate-300 leading-relaxed max-h-52 overflow-y-auto">
+                    <strong class="text-cyan-400 block mb-1.5">คำแนะนำจาก Groq AI:</strong>
+                    <div id="ai-result-text">กำลังประมวลผล...</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
 
     <script>
         const SUPABASE_URL = 'https://gfjwpkuutrriavympmez.supabase.co';
@@ -629,7 +517,6 @@
         let downsampledPeaks = [];
         let activeClips = [];
         let loadedFileName = "video.mp4";
-        let loadedFile = null; // เก็บ File object ต้นฉบับไว้ใช้ตอน export MP4 จริง
         let isProcessing = false;
         let currentZoom = 1;
         let isDraggingMinimap = false;
@@ -750,7 +637,6 @@
 
         async function handleVideoFile(file) {
             loadedFileName = file.name;
-            loadedFile = file;
             const tempVideo = document.createElement('video');
             tempVideo.src = URL.createObjectURL(file);
 
@@ -793,7 +679,7 @@
         function generatePeaksData() {
             if (!audioBuffer) return;
             const numChannels = audioBuffer.numberOfChannels;
-            const samplesPerPeak = Math.floor(audioBuffer.sampleRate * 0.01);
+            const samplesPerPeak = Math.floor(audioBuffer.sampleRate * 0.01); 
             const numPeaks = Math.floor(audioBuffer.length / samplesPerPeak);
             const channels = [];
             for (let c = 0; c < numChannels; c++) channels.push(audioBuffer.getChannelData(c));
@@ -854,14 +740,13 @@
                 if (isSpeech) rawClips.push({ start: speechStart, end: totalDuration });
 
                 activeClips = mergeClipsAdvanced(rawClips, removeSilenceSec, minCutSec);
-
+                
                 renderWaveform();
                 renderMinimap();
                 renderClipsList(activeClips, totalDuration);
 
                 document.getElementById('export-group').classList.remove('hidden');
                 document.getElementById('ai-analyze-btn').disabled = activeClips.length === 0;
-                document.getElementById('export-mp4-btn').disabled = activeClips.length === 0;
 
                 isProcessing = false;
             });
@@ -925,7 +810,7 @@
                 ctx.fillText(`${db}dB`, 8, y - 3);
             });
 
-            const timeInterval = Math.max(2, Math.floor(15 / currentZoom));
+            const timeInterval = Math.max(2, Math.floor(15 / currentZoom)); 
             ctx.strokeStyle = 'rgba(148, 163, 184, 0.2)';
             ctx.fillStyle = '#94a3b8';
 
@@ -1051,7 +936,7 @@
                 const item = document.createElement('div');
                 item.className = 'p-2.5 bg-slate-950/80 rounded-xl border border-indigo-500/20 flex justify-between items-center hover:border-cyan-400/60 hover:bg-slate-900 cursor-pointer transition shadow-sm';
                 item.innerHTML = `
-                    <span><strong class="text-fuchsia-400">#${idx + 1}</strong> [${clip.start.toFixed(2)}s - ${clip.end.toFixed(2)}s]</span>
+                    <span><strong class="text-fuchsia-400">#${idx+1}</strong> [${clip.start.toFixed(2)}s - ${clip.end.toFixed(2)}s]</span>
                     <span class="text-[10px] text-cyan-300 bg-slate-900 px-2 py-0.5 rounded-full border border-indigo-500/30">${(clip.end - clip.start).toFixed(2)}s</span>
                 `;
                 item.onclick = () => {
@@ -1090,7 +975,7 @@
                 pathUrlTag = `<pathurl>file://localhost/${safeFileName}</pathurl>`;
             }
 
-            let videoTrackXml = ''; let audioTrack1Xml = ''; let currentTimelineFrame = 0;
+            let videoTrackXml = ''; let audioTrack1Xml = ''; let currentTimelineFrame = 0; 
 
             clips.forEach((clip, idx) => {
                 let inFrame = Math.round(clip.start * fps);
@@ -1148,150 +1033,6 @@
             a.click();
         }
 
-        // ============================================================
-        // --- MP4 EXPORT (ffmpeg.wasm ตัดจริงในเบราว์เซอร์ ไม่ต้องมีเซิร์ฟเวอร์) ---
-        // ============================================================
-        let ffmpegInstance = null;
-        let ffmpegLoadingPromise = null;
-
-        function waitForFFmpegLib() {
-            if (window.__FFmpegLib) return Promise.resolve(window.__FFmpegLib);
-            return new Promise((resolve) => {
-                window.addEventListener('ffmpeg-lib-ready', () => resolve(window.__FFmpegLib), { once: true });
-            });
-        }
-
-        async function getFFmpeg(onLog) {
-            if (ffmpegInstance) return ffmpegInstance;
-            if (ffmpegLoadingPromise) return ffmpegLoadingPromise;
-
-            ffmpegLoadingPromise = (async () => {
-                const { FFmpeg, toBlobURL } = await waitForFFmpegLib();
-                const ff = new FFmpeg();
-                if (onLog) {
-                    ff.on('log', ({ message }) => onLog(message));
-                }
-                const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/esm';
-                await ff.load({
-                    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-                    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-                });
-                ffmpegInstance = ff;
-                return ff;
-            })();
-
-            return ffmpegLoadingPromise;
-        }
-
-        const exportMp4Btn = document.getElementById('export-mp4-btn');
-        const exportMp4BtnLabel = document.getElementById('export-mp4-btn-label');
-        const mp4ProgressWrap = document.getElementById('mp4-progress-wrap');
-        const mp4ProgressBar = document.getElementById('mp4-progress-bar');
-        const mp4ProgressText = document.getElementById('mp4-progress-text');
-
-        function setMp4Progress(percent, text) {
-            mp4ProgressBar.style.width = `${Math.max(0, Math.min(100, percent))}%`;
-            if (text) mp4ProgressText.innerText = text;
-        }
-
-        exportMp4Btn.addEventListener('click', async () => {
-            if (!activeClips.length || !loadedFile) return;
-
-            exportMp4Btn.disabled = true;
-            document.getElementById('export-xml-btn').disabled = true;
-            exportMp4BtnLabel.innerText = 'กำลังตัดต่อ...';
-            mp4ProgressWrap.classList.remove('hidden');
-            setMp4Progress(2, 'กำลังโหลดตัวประมวลผลวิดีโอ (ครั้งแรกอาจใช้เวลาสักครู่)...');
-
-            try {
-                const { fetchFile } = await waitForFFmpegLib();
-                const ff = await getFFmpeg();
-
-                ff.on('progress', ({ progress }) => {
-                    // progress คือ 0-1 ของงานที่ ffmpeg กำลังทำอยู่ ณ ขณะนั้น (ต่อคำสั่ง)
-                });
-
-                const inputExt = (loadedFile.name.split('.').pop() || 'mp4').toLowerCase();
-                const inputName = `input.${inputExt}`;
-
-                setMp4Progress(8, 'กำลังโหลดไฟล์วิดีโอต้นฉบับเข้าตัวประมวลผล...');
-                await ff.writeFile(inputName, await fetchFile(loadedFile));
-
-                const clipFileNames = [];
-                const totalSteps = activeClips.length + 1; // +1 สำหรับขั้นตอนต่อคลิปทั้งหมดเข้าด้วยกัน
-
-                for (let i = 0; i < activeClips.length; i++) {
-                    const clip = activeClips[i];
-                    const outName = `clip_${String(i).padStart(4, '0')}.mp4`;
-                    const dur = Math.max(0.05, clip.end - clip.start);
-
-                    const baseProgress = 10 + (i / totalSteps) * 80;
-                    setMp4Progress(baseProgress, `กำลังตัดคลิปที่ ${i + 1} / ${activeClips.length} (${dur.toFixed(1)}s)...`);
-
-                    // re-encode ทุกคลิปเพื่อให้รอยตัดสะอาด (ไม่ใช้ -c copy เพราะจุดตัดอาจไม่ตรง keyframe)
-                    await ff.exec([
-                        '-ss', clip.start.toFixed(3),
-                        '-i', inputName,
-                        '-t', dur.toFixed(3),
-                        '-c:v', 'libx264',
-                        '-preset', 'ultrafast',
-                        '-crf', '22',
-                        '-pix_fmt', 'yuv420p',
-                        '-c:a', 'aac',
-                        '-b:a', '160k',
-                        '-avoid_negative_ts', 'make_zero',
-                        outName
-                    ]);
-
-                    clipFileNames.push(outName);
-                }
-
-                setMp4Progress(92, 'กำลังต่อคลิปทั้งหมดเข้าด้วยกัน...');
-
-                const concatListContent = clipFileNames.map(name => `file '${name}'`).join('\n');
-                await ff.writeFile('concat_list.txt', concatListContent);
-
-                await ff.exec([
-                    '-f', 'concat',
-                    '-safe', '0',
-                    '-i', 'concat_list.txt',
-                    '-c', 'copy',
-                    'output.mp4'
-                ]);
-
-                setMp4Progress(97, 'กำลังเตรียมไฟล์ให้ดาวน์โหลด...');
-
-                const outputData = await ff.readFile('output.mp4');
-                const blob = new Blob([outputData.buffer], { type: 'video/mp4' });
-                const outFileName = `${loadedFileName.split('.')[0]}_AutoCut.mp4`;
-
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = outFileName;
-                a.click();
-
-                // ล้างไฟล์ชั่วคราวใน virtual FS ของ ffmpeg เพื่อคืนหน่วยความจำ
-                try {
-                    for (const name of clipFileNames) await ff.deleteFile(name);
-                    await ff.deleteFile('concat_list.txt');
-                    await ff.deleteFile('output.mp4');
-                    await ff.deleteFile(inputName);
-                } catch (cleanupErr) { /* เพิกเฉยถ้าลบไม่สำเร็จ */ }
-
-                setMp4Progress(100, `เสร็จสิ้น! ดาวน์โหลด ${outFileName} แล้ว`);
-                setTimeout(() => { mp4ProgressWrap.classList.add('hidden'); }, 3000);
-
-            } catch (err) {
-                console.error(err);
-                setMp4Progress(0, 'เกิดข้อผิดพลาด: ' + err.message);
-                alert('ไม่สามารถ Export MP4 ได้: ' + err.message);
-            } finally {
-                exportMp4Btn.disabled = false;
-                document.getElementById('export-xml-btn').disabled = false;
-                exportMp4BtnLabel.innerText = 'Export วิดีโอ (.MP4)';
-            }
-        });
-
         document.getElementById('ai-analyze-btn').addEventListener('click', async () => {
             const apiKey = document.getElementById('api-key').value.trim();
             if (!apiKey) return alert('กรุณากรอก Groq API Key ก่อนครับ');
@@ -1304,7 +1045,7 @@
             aiBtn.innerText = "Groq AI กำลังวิเคราะห์...";
             resultBox.classList.remove('hidden');
 
-            const clipsSummary = activeClips.map((c, i) => `#${i + 1}: เริ่ม ${c.start.toFixed(1)}s - จบ ${c.end.toFixed(1)}s (ยาว ${(c.end - c.start).toFixed(1)}s)`).join('\n');
+            const clipsSummary = activeClips.map((c, i) => `#${i+1}: เริ่ม ${c.start.toFixed(1)}s - จบ ${c.end.toFixed(1)}s (ยาว ${(c.end - c.start).toFixed(1)}s)`).join('\n');
             const prompt = `คุณคือผู้เชี่ยวชาญด้านการตัดต่อวิดีโอสั้น รายการคลิปที่ตัดเงียบออกแล้ว:\n${clipsSummary}\n\nช่วยเลือกช่วงคลิปที่ดีที่สุด 1-2 ช่วงทำไฮไลท์ TikTok/Reels และแนะนำ Hook วินาทีแรกครับ`;
 
             try {
@@ -1330,5 +1071,4 @@
         });
     </script>
 </body>
-
 </html>
