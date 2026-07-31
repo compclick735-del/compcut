@@ -62,13 +62,13 @@
 </head>
 <body class="text-slate-100 min-h-screen pb-12 select-none relative overflow-x-hidden">
 
-    <!-- Ambient Background Animation -->
+    <!-- Ambient Stars -->
     <div class="fixed inset-0 pointer-events-none z-0">
         <div class="absolute top-1/4 left-1/3 w-1 h-1 bg-white rounded-full animate-ping opacity-75"></div>
         <div class="absolute top-2/3 right-1/4 w-1.5 h-1.5 bg-cyan-400 rounded-full animate-pulse opacity-60"></div>
     </div>
 
-    <!-- Header Navigation -->
+    <!-- Header -->
     <header class="border-b border-indigo-500/20 bg-slate-950/70 backdrop-blur-xl sticky top-0 z-50 py-4 px-6 shadow-2xl">
         <div class="max-w-[1600px] mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -337,6 +337,7 @@
 
         // --- UPGRADE CHECKOUT SYSTEM ---
         async function handleUpgrade() {
+            // ดึง userId ของคนที่ล็อกอินอยู่จาก Supabase Client (_supabase)
             const { data: { user } } = await _supabase.auth.getUser();
 
             if (!user) {
@@ -345,15 +346,19 @@
             }
 
             try {
-                const res = await fetch('/api/checkout', {
+                const res = await fetch(`${SUPABASE_URL}/functions/v1/checkout`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
                     body: JSON.stringify({ userId: user.id }),
                 });
 
                 const data = await res.json();
 
                 if (data.url) {
+                    // เปลี่ยนหน้าไปสแกน PromptPay / ชำระเงินบน Stripe
                     window.location.href = data.url;
                 } else {
                     alert('เกิดข้อผิดพลาด: ' + (data.error || 'ไม่สามารถสร้างลิงก์ชำระเงินได้'));
@@ -361,6 +366,35 @@
             } catch (err) {
                 console.error(err);
                 alert('ไม่สามารถเชื่อมต่อระบบชำระเงินได้');
+            }
+        }
+
+        // --- SERVER-SIDE QUOTA CHECK ---
+        // เรียก Edge Function 'check-usage' เพื่อตรวจสอบสิทธิ์จริงจากฐานข้อมูล
+        // (ป้องกันการแก้ currentUserPlan ผ่าน Developer Console)
+        async function checkUsageOnServer(durationSec) {
+            try {
+                const { data: { session } } = await _supabase.auth.getSession();
+                const headers = { 'Content-Type': 'application/json' };
+                if (session?.access_token) {
+                    headers['Authorization'] = `Bearer ${session.access_token}`;
+                }
+
+                const res = await fetch(`${SUPABASE_URL}/functions/v1/check-usage`, {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ durationSec }),
+                });
+
+                if (!res.ok) {
+                    // ถ้าเซิร์ฟเวอร์ล่มชั่วคราว ให้ fallback เป็น deny เพื่อความปลอดภัย (fail-closed)
+                    return { allowed: false, message: 'ไม่สามารถตรวจสอบสิทธิ์ได้ในขณะนี้ กรุณาลองใหม่อีกครั้งครับ' };
+                }
+
+                return await res.json();
+            } catch (err) {
+                console.error('checkUsageOnServer error:', err);
+                return { allowed: false, message: 'ไม่สามารถเชื่อมต่อระบบตรวจสอบสิทธิ์ได้' };
             }
         }
 
@@ -401,6 +435,7 @@
                 googleBtn.classList.add('hidden');
                 userProfile.classList.remove('hidden');
 
+                // ดึงข้อมูลสถานะ Plan จาก Supabase Database Table 'profiles'
                 try {
                     const { data, error } = await _supabase
                         .from('profiles')
@@ -420,7 +455,7 @@
                 if (currentUserPlan === 'pro') {
                     planBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-fuchsia-500 text-white font-bold border border-amber-300 uppercase tracking-widest ml-1 shadow-lg";
                     planBadge.innerText = "PRO MEMBER (Unlimited)";
-                    if (upgradeBtn) upgradeBtn.classList.add('hidden');
+                    if (upgradeBtn) upgradeBtn.classList.add('hidden'); // ซ่อนปุ่ม Upgrade ถ้าเป็น Pro แล้ว
                 } else {
                     planBadge.className = "text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-300 border border-cyan-500/40 uppercase tracking-widest ml-1";
                     planBadge.innerText = "FREE PLAN (Max 10m)";
@@ -600,7 +635,6 @@
             }
         }
 
-        // --- UPDATED HANDLER WITH FILEREADER TO PREVENT NOTREADABLEERROR ---
         async function handleVideoFile(file) {
             loadedFileName = file.name;
             const tempVideo = document.createElement('video');
@@ -609,17 +643,14 @@
             tempVideo.onloadedmetadata = async () => {
                 const durationSec = tempVideo.duration;
 
-                // --- CHECK QUOTA & DURATION LIMIT ---
-                if (currentUserPlan === 'guest' && durationSec > 180) {
-                    alert("⚠️ โควต้าผู้ใช้ทั่วไป (Guest) ตัดวิดีโอได้สูงสุด 3 นาทีครับ\n\nโปรดกด 'Sign in with Google' ด้านบนเพื่อปลดล็อกสิทธิ์ฟรี 10 นาที หรือ Upgrade PRO เพื่อไม่จำกัดความยาว!");
+                // --- CHECK QUOTA & DURATION LIMIT (ตรวจกับเซิร์ฟเวอร์จริง กัน user แก้ค่าใน console) ---
+                const usageCheck = await checkUsageOnServer(durationSec);
+                if (!usageCheck.allowed) {
+                    alert("⚠️ " + usageCheck.message);
                     return;
                 }
 
-                if (currentUserPlan === 'free' && durationSec > 600) {
-                    alert("⚠️ โควต้าฟรี (Free Plan) ตัดวิดีโอได้สูงสุด 10 นาทีครับ\n\nวิดีโอนี้ยาว " + (durationSec/60).toFixed(1) + " นาที โปรดกดปุ่ม Upgrade PRO เพื่อปลดล็อกการตัดแบบไม่จำกัด!");
-                    return;
-                }
-
+                // หากผ่านเงื่อนไข ให้ประมวลผลต่อ
                 videoPlayer.src = tempVideo.src;
                 videoPlayer.classList.remove('hidden');
                 videoPlaceholder.classList.add('hidden');
@@ -629,30 +660,19 @@
 
                 document.getElementById('clips-list').innerHTML = `<p class="text-cyan-400 text-center py-10 font-mono animate-pulse">กำลังสแกนความถี่คลื่นเสียง...</p>`;
 
-                // อ่านไฟล์ด้วย FileReader + Catch Permission Error
-                const reader = new FileReader();
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
 
-                reader.onload = async (e) => {
-                    try {
-                        const arrayBuffer = e.target.result;
-                        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                        audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+                    document.getElementById('time-start-label').innerText = "00:00";
+                    document.getElementById('time-end-label').innerText = formatTimecode(audioBuffer.duration);
 
-                        document.getElementById('time-start-label').innerText = "00:00";
-                        document.getElementById('time-end-label').innerText = formatTimecode(audioBuffer.duration);
-
-                        generatePeaksData();
-                        recalculateAndRender();
-                    } catch (err) {
-                        alert("ประมวลผลไฟล์เสียงล้มเหลว (ไฟล์อาจจะไม่สมบูรณ์หรือถูกบีบอัดแบบไม่รองรับ): " + err.message);
-                    }
-                };
-
-                reader.onerror = () => {
-                    alert("❌ อ่านไฟล์เสียงล้มเหลว (Permission Error):\n1. กรุณาปิดโปรแกรม OBS / Premiere Pro / เครื่องเล่นวิดีโอ ที่เปิดไฟล์นี้ค้างอยู่\n2. ย้ายไฟล์มาไว้ใน Drive C: หรือ Desktop แล้วลองใหม่อีกครั้งครับ");
-                };
-
-                reader.readAsArrayBuffer(file);
+                    generatePeaksData();
+                    recalculateAndRender();
+                } catch (err) {
+                    alert("อ่านไฟล์เสียงล้มเหลว: " + err.message);
+                }
             };
         }
 
