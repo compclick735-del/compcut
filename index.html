@@ -78,7 +78,6 @@
                 <div>
                     <h1 class="text-lg font-extrabold tracking-wider bg-gradient-to-r from-cyan-400 via-fuchsia-300 to-indigo-300 bg-clip-text text-transparent">
                         AUTOCUT PRO 
-                        <!-- เปลี่ยนสถานะเป็น PRO ฟรีสำหรับทุกคน -->
                         <span id="plan-badge" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-fuchsia-500 text-white font-bold border border-amber-300 uppercase tracking-widest ml-1 shadow-lg">PRO (UNLIMITED)</span>
                     </h1>
                     <p class="text-[10px] text-slate-400">AI-Powered Silence Cutter</p>
@@ -88,7 +87,7 @@
             <!-- Auth & Action Section -->
             <div class="flex items-center gap-3">
                 <!-- Logged Out State -->
-                <button id="google-login-btn" onclick="loginWithGoogle()" class="flex items-center gap-2.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-indigo-500/30 hover:border-cyan-400/60 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 shadow-lg hover:shadow-cyan-500/10 active:scale-95">
+                <button id="google-login-btn" onclick="loginWithGoogle()" class="flex items-center gap-2.5 bg-slate-900/95 hover:bg-slate-800 text-slate-200 border border-indigo-500/30 hover:border-cyan-400/60 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 shadow-lg hover:shadow-cyan-500/10 active:scale-95">
                     <svg class="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
                         <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.15C3.26 21.3 7.31 24 12 24z"/>
@@ -309,14 +308,13 @@
     </main>
 
     <script>
-        // Supabase Settings (ยังเก็บไว้เผื่ออยากให้ผู้ใช้ล็อกอินเพื่อแสดงโปรไฟล์เฉยๆ)
+        // Supabase Settings[cite: 2]
         const SUPABASE_URL = 'https://gfjwpkuutrriavympmez.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_nW5HkRj0maBmBP1Kj-pmsQ_TAQDavKD';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentUserPlan = 'pro'; // บังคับให้ทุกคนเป็น PRO ทันที
+        let currentUserPlan = 'pro'; 
 
-        // --- AUTH SYSTEM (เก็บไว้แค่สำหรับแสดงชื่อผู้ใช้/รูปโปรไฟล์) ---
         async function loginWithGoogle() {
             try {
                 const { error } = await _supabase.auth.signInWithOAuth({
@@ -354,8 +352,6 @@
                 googleBtn.classList.remove('hidden');
                 userProfile.classList.add('hidden');
             }
-            
-            // ไม่ต้องเช็ค Plan จากฐานข้อมูลแล้ว ปล่อยให้แสดงป้าย PRO (UNLIMITED) ตลอดเวลา
             currentUserPlan = 'pro';
         }
 
@@ -364,7 +360,6 @@
             updateAuthAndPlanUI(session);
         });
 
-        // --- APP CONTROLS & AUDIO PROCESSING ---
         const PRESETS = {
             calm: { removeSilenceMs: 400, keepTalksMs: 200, marginBeforeMs: 150, marginAfterMs: 150, minCutMs: 1200 },
             measured: { removeSilenceMs: 300, keepTalksMs: 150, marginBeforeMs: 100, marginAfterMs: 100, minCutMs: 1000 },
@@ -528,7 +523,6 @@
             tempVideo.src = URL.createObjectURL(file);
 
             tempVideo.onloadedmetadata = async () => {
-                // ปิดระบบตรวจสอบโควต้าผู้ใช้ออกไปทั้งหมด รับไฟล์ยาวแค่ไหนก็ได้
                 videoPlayer.src = tempVideo.src;
                 videoPlayer.classList.remove('hidden');
                 videoPlaceholder.classList.add('hidden');
@@ -840,9 +834,15 @@
             });
         }
 
+        // ==========================================
+        // ฟังก์ชันสร้าง XML พร้อมบังคับค่า 1920x1080 / 60 FPS
+        // ==========================================
         function generateXML(fileName, clips, userFolderPath) {
-            const fps = 60; const timebase = 60; const safeFileName = escapeXml(fileName);
+            const fps = 60; 
+            const timebase = 60; 
+            const safeFileName = escapeXml(fileName);
             let pathUrlTag = '';
+            
             if (userFolderPath && userFolderPath.trim() !== '') {
                 let cleanFolder = userFolderPath.trim().replace(/\\/g, '/');
                 if (!cleanFolder.startsWith('/')) cleanFolder = '/' + cleanFolder;
@@ -852,7 +852,9 @@
                 pathUrlTag = `<pathurl>file://localhost/${safeFileName}</pathurl>`;
             }
 
-            let videoTrackXml = ''; let audioTrack1Xml = ''; let currentTimelineFrame = 0; 
+            let videoTrackXml = ''; 
+            let audioTrack1Xml = ''; 
+            let currentTimelineFrame = 0; 
 
             clips.forEach((clip, idx) => {
                 let inFrame = Math.round(clip.start * fps);
@@ -863,7 +865,7 @@
                 currentTimelineFrame = endTimeline;
 
                 const fileBlock = `
-                        <file id="file-1">
+                        <file id="file-${idx + 1}">
                             <name>${safeFileName}</name>${pathUrlTag}
                             <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
                             <media>
@@ -883,17 +885,39 @@
             });
 
             return `<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE xmeml>
-<xmeml version="5">
-    <sequence id="sequence-1">
-        <name>AutoCut_${safeFileName}</name>
-        <duration>${currentTimelineFrame}</duration>
-        <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
-        <media>
-            <video><track>${videoTrackXml}</track></video>
-            <audio><track>${audioTrack1Xml}</track></audio>
-        </media>
-    </sequence>
+<xmeml version="4">
+    <project>
+        <name>AutoCut_Sequence_Project</name>
+        <children>
+            <sequence id="sequence-1">
+                <name>AutoCut_${safeFileName}</name>
+                <duration>${currentTimelineFrame}</duration>
+                <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
+                <timecode>
+                    <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
+                    <string>00:00:00:00</string>
+                </timecode>
+                <media>
+                    <video>
+                        <format>
+                            <samplecharacteristics>
+                                <width>1920</width>
+                                <height>1080</height>
+                                <anamorphic>FALSE</anamorphic>
+                                <pixelaspectratio>square</pixelaspectratio>
+                                <fielddominance>none</fielddominance>
+                                <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
+                            </samplecharacteristics>
+                        </format>
+                        <track>${videoTrackXml}</track>
+                    </video>
+                    <audio>
+                        <track>${audioTrack1Xml}</track>
+                    </audio>
+                </media>
+            </sequence>
+        </children>
+    </project>
 </xmeml>`;
         }
 
