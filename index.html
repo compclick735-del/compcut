@@ -86,8 +86,7 @@
 
             <!-- Auth & Action Section -->
             <div class="flex items-center gap-3">
-                <!-- Logged Out State -->
-                <button id="google-login-btn" onclick="loginWithGoogle()" class="flex items-center gap-2.5 bg-slate-900/95 hover:bg-slate-800 text-slate-200 border border-indigo-500/30 hover:border-cyan-400/60 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 shadow-lg hover:shadow-cyan-500/10 active:scale-95">
+                <button id="google-login-btn" onclick="loginWithGoogle()" class="flex items-center gap-2.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-indigo-500/30 hover:border-cyan-400/60 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-300 shadow-lg hover:shadow-cyan-500/10 active:scale-95">
                     <svg class="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
                         <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.15C3.26 21.3 7.31 24 12 24z"/>
@@ -97,7 +96,6 @@
                     <span>Sign in with Google</span>
                 </button>
 
-                <!-- Logged In State -->
                 <div id="user-profile" class="hidden flex items-center gap-3 bg-slate-900/90 border border-indigo-500/30 px-3 py-1.5 rounded-xl shadow-lg">
                     <img id="user-avatar" src="" alt="Avatar" class="w-7 h-7 rounded-full border border-cyan-400">
                     <div class="text-left hidden sm:block">
@@ -297,9 +295,13 @@
                     <p class="text-slate-600 text-center py-10">ลากไฟล์วิดีโอเพื่อเริ่มสแกนคลื่นเสียง</p>
                 </div>
 
-                <div id="export-group" class="hidden pt-3 border-t border-indigo-500/20">
+                <div id="export-group" class="hidden pt-3 border-t border-indigo-500/20 space-y-2">
                     <button id="export-xml-btn" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white text-xs font-bold rounded-xl shadow-lg hover:opacity-90 transition">
                         Export Premiere (.XML)
+                    </button>
+                    <!-- ปุ่มดาวน์โหลดไฟล์ .srt ช่วงเงียบเพิ่มเข้ามาตรงนี้ -->
+                    <button id="export-srt-btn" class="w-full py-3 bg-gradient-to-r from-cyan-600 to-teal-600 text-white text-xs font-bold rounded-xl shadow-lg hover:opacity-90 transition">
+                        Download Silence Map (.srt)
                     </button>
                 </div>
             </div>
@@ -308,12 +310,11 @@
     </main>
 
     <script>
-        // Supabase Settings[cite: 2]
         const SUPABASE_URL = 'https://gfjwpkuutrriavympmez.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_nW5HkRj0maBmBP1Kj-pmsQ_TAQDavKD';
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let currentUserPlan = 'pro'; 
+        let currentUserPlan = 'pro';
 
         async function loginWithGoogle() {
             try {
@@ -834,15 +835,12 @@
             });
         }
 
-        // ==========================================
-        // ฟังก์ชันสร้าง XML พร้อมบังคับค่า 1920x1080 / 60 FPS
-        // ==========================================
         function generateXML(fileName, clips, userFolderPath) {
             const fps = 60; 
             const timebase = 60; 
             const safeFileName = escapeXml(fileName);
-            let pathUrlTag = '';
             
+            let pathUrlTag = '';
             if (userFolderPath && userFolderPath.trim() !== '') {
                 let cleanFolder = userFolderPath.trim().replace(/\\/g, '/');
                 if (!cleanFolder.startsWith('/')) cleanFolder = '/' + cleanFolder;
@@ -865,7 +863,7 @@
                 currentTimelineFrame = endTimeline;
 
                 const fileBlock = `
-                        <file id="file-${idx + 1}">
+                        <file id="file-1">
                             <name>${safeFileName}</name>${pathUrlTag}
                             <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
                             <media>
@@ -874,9 +872,17 @@
                                         <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
                                         <width>1920</width><height>1080</height>
                                         <pixelaspectratio>square</pixelaspectratio>
+                                        <!-- บังคับ No Fields (Progressive Scan) -->
+                                        <fielddominance>none</fielddominance>
                                     </samplecharacteristics>
                                 </video>
-                                <audio><samplecharacteristics><depth>16</depth><samplerate>48000</samplerate></samplecharacteristics></audio>
+                                <audio>
+                                    <samplecharacteristics>
+                                        <depth>16</depth>
+                                        <samplerate>48000</samplerate>
+                                    </samplecharacteristics>
+                                    <channelcount>2</channelcount>
+                                </audio>
                             </media>
                         </file>`;
 
@@ -885,46 +891,100 @@
             });
 
             return `<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xmeml>
 <xmeml version="4">
-    <project>
-        <name>AutoCut_Sequence_Project</name>
-        <children>
-            <sequence id="sequence-1">
-                <name>AutoCut_${safeFileName}</name>
-                <duration>${currentTimelineFrame}</duration>
-                <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
-                <timecode>
-                    <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
-                    <string>00:00:00:00</string>
-                </timecode>
-                <media>
-                    <video>
-                        <format>
-                            <samplecharacteristics>
-                                <width>1920</width>
-                                <height>1080</height>
-                                <anamorphic>FALSE</anamorphic>
-                                <pixelaspectratio>square</pixelaspectratio>
-                                <fielddominance>none</fielddominance>
-                                <rate><timebase>${timebase}</timebase><ntsc>FALSE</ntsc></rate>
-                            </samplecharacteristics>
-                        </format>
-                        <track>${videoTrackXml}</track>
-                    </video>
-                    <audio>
-                        <track>${audioTrack1Xml}</track>
-                    </audio>
-                </media>
-            </sequence>
-        </children>
-    </project>
+    <sequence id="sequence-1">
+        <name>AutoCut_${safeFileName}</name>
+        <duration>${currentTimelineFrame}</duration>
+        <rate>
+            <timebase>${timebase}</timebase>
+            <ntsc>FALSE</ntsc>
+        </rate>
+        <media>
+            <video>
+                <!-- แท็ก <format> ส่วนนี้คือตัวบังคับให้ Sequence Settings เป็นไปตามที่เราต้องการเป๊ะๆ -->
+                <format>
+                    <samplecharacteristics>
+                        <rate>
+                            <timebase>${timebase}</timebase>
+                            <ntsc>FALSE</ntsc>
+                        </rate>
+                        <width>1920</width>
+                        <height>1080</height>
+                        <pixelaspectratio>square</pixelaspectratio>
+                        <fielddominance>none</fielddominance>
+                    </samplecharacteristics>
+                </format>
+                <track>${videoTrackXml}</track>
+            </video>
+            <audio>
+                <format>
+                    <samplecharacteristics>
+                        <depth>16</depth>
+                        <samplerate>48000</samplerate>
+                    </samplecharacteristics>
+                </format>
+                <!-- บังคับระบบเสียง Sequence ให้เป็น Stereo (2 Channels) -->
+                <outputs>
+                    <group>
+                        <index>1</index>
+                        <numchannels>2</numchannels>
+                        <downmix>0</downmix>
+                        <channel><index>1</index></channel>
+                        <channel><index>2</index></channel>
+                    </group>
+                </outputs>
+                <track>${audioTrack1Xml}</track>
+            </audio>
+        </media>
+    </sequence>
 </xmeml>`;
+        }
+
+        function formatSrtTime(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = Math.floor(totalSeconds % 60);
+            const milliseconds = Math.floor((totalSeconds % 1) * 1000);
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')},${String(milliseconds).padStart(3, '0')}`;
+        }
+
+        function generateSilenceSRT(clips, totalDuration) {
+            let silences = [];
+            let lastEnd = 0;
+
+            clips.forEach(clip => {
+                if (clip.start > lastEnd) {
+                    silences.push({ start: lastEnd, end: clip.start });
+                }
+                lastEnd = clip.end;
+            });
+
+            if (lastEnd < totalDuration) {
+                silences.push({ start: lastEnd, end: totalDuration });
+            }
+
+            let srtContent = "";
+            silences.forEach((silence, index) => {
+                const durationSec = (silence.end - silence.start).toFixed(2);
+                srtContent += `${index + 1}\n`;
+                srtContent += `${formatSrtTime(silence.start)} --> ${formatSrtTime(silence.end)}\n`;
+                srtContent += `[Silence] ช่วงเงียบ (${durationSec}s)\n\n`;
+            });
+
+            return srtContent;
         }
 
         document.getElementById('export-xml-btn').addEventListener('click', () => {
             if (!activeClips.length) return;
             const xml = generateXML(loadedFileName, activeClips, folderPathInput.value);
             downloadFile(xml, `${loadedFileName.split('.')[0]}_AutoCut.xml`, 'text/xml');
+        });
+
+        document.getElementById('export-srt-btn').addEventListener('click', () => {
+            if (!activeClips.length || !audioBuffer) return;
+            const srtData = generateSilenceSRT(activeClips, audioBuffer.duration);
+            downloadFile(srtData, `${loadedFileName.split('.')[0]}_Silence.srt`, 'text/srt');
         });
 
         function downloadFile(content, filename, type) {
